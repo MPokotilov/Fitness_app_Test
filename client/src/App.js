@@ -21,7 +21,7 @@ const Container = styled.div`
 `;
 
 function App() {
-  const { currentUser } = useSelector((state) => state.user);
+  const currentUser = { name: "Mock User" };
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
