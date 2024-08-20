@@ -42,7 +42,7 @@ const NavLogo = styled(LinkR)`
   color: ${({ theme }) => theme.black};
 `;
 const Logo = styled.img`
-  height: 42px;
+  height: 60px;
 `;
 const Mobileicon = styled.div`
   color: ${({ theme }) => theme.text_primary};
