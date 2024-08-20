@@ -5,7 +5,14 @@ const API = axios.create({
 });
 
 export const UserSignUp = async (data) => API.post("/user/signup", data);
-export const UserSignIn = async (data) => API.post("/user/signin", data);
+// export const UserSignIn = async (data) => API.post("/user/signin", data);
+export const UserSignIn = async (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ data: { user: { name: "Test User" }, token: "dummyToken" } });
+      }, 1000);
+    });
+  };
 
 export const getDashboardDetails = async (token) =>
   API.get("/user/dashboard", {

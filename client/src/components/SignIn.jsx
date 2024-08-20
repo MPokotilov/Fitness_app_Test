@@ -61,7 +61,7 @@ const SignIn = () => {
   return (
     <Container>
       <div>
-        <Title>Welcome to MastaFit app 👋</Title>
+        <Title>Welcome to MastaFit fitness app</Title>
         <Span>Please login with your details here</Span>
       </div>
       <div

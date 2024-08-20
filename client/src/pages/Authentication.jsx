@@ -23,11 +23,15 @@ const Left = styled.div`
 `;
 const Logo = styled.img`
   position: absolute;
-  width: 70px;
-  top: 40px;
-  left: 60px;
+  width: 110px;
+  top: 10px;
+  left: 70px;
   z-index: 10;
+  background-color: rgba(255, 255, 255); /* Light background with transparency */
+  padding: 5px; /* Optional padding */
+  border-radius: 50%; /* Rounded corners for a better aesthetic */
 `;
+
 const Image = styled.img`
   position: relative;
   height: 100%;
