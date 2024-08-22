@@ -73,6 +73,7 @@ const Navlink = styled(NavLink)`
   font-weight: 500;
   cursor: pointer;
   transition: all 1s slide-in;
+  white-space: nowrap;
   text-decoration: none;
   &:hover {
     color: ${({ theme }) => theme.primary};

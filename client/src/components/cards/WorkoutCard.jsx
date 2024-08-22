@@ -1,4 +1,5 @@
-import { FitnessCenterRounded, TimelapseRounded } from "@mui/icons-material";
+import { AccessTimeFilled } from "@mui/icons-material";
+import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
 import React from "react";
 import styled from "styled-components";
 
@@ -61,11 +62,11 @@ const WorkoutCard = ({ workout }) => {
       </Sets>
       <Flex>
         <Details>
-          <FitnessCenterRounded sx={{ fontSize: "20px" }} />
+        <FitnessIcon style={{ width: '20px', height: '20px' }} />
           {workout?.weight} kg
         </Details>
         <Details>
-          <TimelapseRounded sx={{ fontSize: "20px" }} />
+          <AccessTimeFilled sx={{ fontSize: "20px" }} />
           {workout?.duration} min
         </Details>
       </Flex>
