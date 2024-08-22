@@ -74,7 +74,6 @@ const Navlink = styled(NavLink)`
   cursor: pointer;
   transition: all 1s slide-in;
   text-decoration: none;
-  white-space: nowrap;
   &:hover {
     color: ${({ theme }) => theme.primary};
   }
