@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import LogoImg from "../utils/Images/logo.png";
+import LogoImg from "../utils/Images/Logo.png";
 import { Link as LinkR, NavLink } from "react-router-dom";
 import { MenuRounded } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -147,7 +147,7 @@ const Navbar = ({ currentUser }) => {
           <Navlink to="/workouts">Workouts</Navlink>
           <Navlink to="/tutorials">Tutorials</Navlink>
           <Navlink to="/blogs">Blogs</Navlink>
-          <Navlink to="/tracker">Calorie tracker</Navlink>
+          <Navlink to="/calorie-tracker">Calorie tracker</Navlink>
         </MobileMenu>
 
         <NavItems>
@@ -155,7 +155,7 @@ const Navbar = ({ currentUser }) => {
           <Navlink to="/workouts">Workouts</Navlink>
           <Navlink to="/tutorials">Tutorials</Navlink>
           <Navlink to="/blogs">Blogs</Navlink>
-          <Navlink to="/tracker">Calorie tracker</Navlink>
+          <Navlink to="/calorie-tracker">Calorie tracker</Navlink>
         </NavItems>
 
         <UserContainer>

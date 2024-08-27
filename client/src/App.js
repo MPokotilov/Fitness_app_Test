@@ -1,13 +1,12 @@
+import React from "react";
 import { ThemeProvider, styled } from "styled-components";
 import { lightTheme } from "./utils/Themes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Authentication from "./pages/Authentication";
-import { useState } from "react";
-import { useSelector } from "react-redux";
 import Navbar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
-
+import CalorieTrackerPage from "./pages/CalorieTrackerPage"; 
 const Container = styled.div`
   width: 100%;
   height: 100vh;
@@ -21,7 +20,8 @@ const Container = styled.div`
 `;
 
 function App() {
-  const currentUser = { name: "Mock User" };
+  const currentUser = { name: "Mock User", img: "path/to/image.jpg" }; 
+
   return (
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
@@ -31,6 +31,11 @@ function App() {
             <Routes>
               <Route path="/" exact element={<Dashboard />} />
               <Route path="/workouts" exact element={<Workouts />} />
+              <Route
+                path="/calorie-tracker"
+                exact
+                element={<CalorieTrackerPage />}
+              />
             </Routes>
           </Container>
         ) : (
