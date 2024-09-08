@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-        currentUser: { name: "Test User", img: "path/to/image.jpg" },
+  currentUser: null,
 };
 
 export const userSlice = createSlice({

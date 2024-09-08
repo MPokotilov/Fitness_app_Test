@@ -6,6 +6,7 @@ const CalorieTrackerPage = () => {
   const [targetWeight, setTargetWeight] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [dailyCalories, setDailyCalories] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   const calculateDailyCalories = () => {
     if (!currentWeight || !targetWeight || !targetDate) {
@@ -25,12 +26,22 @@ const CalorieTrackerPage = () => {
       return;
     }
 
-    const weightDifference = targetW - currentW;
+    const weightDifference = currentW - targetW; 
     const caloriesPerKg = 7700; 
     const totalCalories = weightDifference * caloriesPerKg;
     const dailyCal = totalCalories / days;
     const baseCalories = 2000; 
-    setDailyCalories(baseCalories + dailyCal);
+
+    
+    if (weightDifference / days > 0.5) { 
+      setErrorMessage("It is unrealistic to lose more than 0.5 kg per day. Please choose a longer period.");
+      setDailyCalories(null); 
+      return;
+    }
+
+   
+    setDailyCalories(baseCalories - dailyCal);
+    setErrorMessage(""); 
   };
 
   return (
@@ -38,7 +49,7 @@ const CalorieTrackerPage = () => {
       <Card>
         <Title>Calorie Tracker</Title>
         <Form>
-          <Label>Сurrent weight (Kg):</Label>
+          <Label>Current weight (Kg):</Label>
           <Input
             type="number"
             value={currentWeight}
@@ -59,6 +70,11 @@ const CalorieTrackerPage = () => {
             onChange={(e) => setTargetDate(e.target.value)}
           />
           <Button onClick={calculateDailyCalories}>Calculate</Button>
+          
+          {errorMessage && (
+            <Error>{errorMessage}</Error> 
+          )}
+
           {dailyCalories !== null && (
             <Result>
               To achieve your goal you need to consume approximately{" "}
@@ -72,7 +88,6 @@ const CalorieTrackerPage = () => {
 };
 
 export default CalorieTrackerPage;
-
 
 const Container = styled.div`
   flex: 1;
@@ -146,5 +161,12 @@ const Result = styled.div`
   margin-top: 16px;
   font-size: 18px;
   color: ${({ theme }) => theme.text_primary};
+  text-align: center;
+`;
+
+const Error = styled.div`
+  margin-top: 16px;
+  font-size: 16px;
+  color: red;
   text-align: center;
 `;

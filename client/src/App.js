@@ -3,6 +3,8 @@ import { ThemeProvider, styled } from "styled-components";
 import { lightTheme } from "./utils/Themes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Authentication from "./pages/Authentication";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import Navbar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
@@ -20,7 +22,7 @@ const Container = styled.div`
 `;
 
 function App() {
-  const currentUser = { name: "Mock User", img: "path/to/image.jpg" }; 
+    const { currentUser } = useSelector((state) => state.user);
 
   return (
     <ThemeProvider theme={lightTheme}>
