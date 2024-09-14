@@ -75,6 +75,7 @@ export const UserLogin = async (req, res, next) => {
 export const getUserDashboard = async (req, res, next) => {
   try {
     const userId = req.user?.id;
+    console.log('User ID:', userId);
     const user = await User.findById(userId);
     if (!user) {
       return next(createError(404, "User not found"));
@@ -190,6 +191,7 @@ export const getUserDashboard = async (req, res, next) => {
       pieChartData: pieChartData,
     });
   } catch (err) {
+    console.log('Error fetching user dashboard:', err);
     next(err);
   }
 };

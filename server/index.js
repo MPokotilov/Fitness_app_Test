@@ -14,14 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user/", UserRoutes);
 // error handler
 app.use((err, req, res, next) => {
-  const status = err.status || 500;
-  const message = err.message || "Something went wrong";
-  return res.status(status).json({
+  console.error("Server Error:", err);  // Log detailed error information
+  res.status(err.status || 500).json({
     success: false,
-    status,
-    message,
+    status: err.status || 500,
+    message: err.message || "Internal Server Error",
   });
 });
+
 
 app.get("/", async (req, res) => {
   res.status(200).json({

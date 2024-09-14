@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://fitnesstrack-vtv1.onrender.com/api/",
+  baseURL: "http://localhost:8080/api",
 });
 
 export const UserSignUp = async (data) => API.post("/user/signup", data);
@@ -9,7 +9,7 @@ export const UserSignUp = async (data) => API.post("/user/signup", data);
 export const UserSignIn = async (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve({ data: { user: { name: "Test User" }, token: "dummyToken" } });
+        resolve({ data: { user: { name: "Test User" }, token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZGM3NmE0MmExZjZlMjgxZWYxODU4NyIsImlhdCI6MTcyNTcyNDMyNCwiZXhwIjozMTcyNzAxNjY3MjR9.Fkx83CPAjfEk_xtdaKiafF0DNGYMxGoLRy2zA7r3UtU" } });
       }, 1000);
     });
   };
