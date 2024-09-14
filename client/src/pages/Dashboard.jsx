@@ -77,6 +77,7 @@ const Dashboard = () => {
   const dashboardData = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
+    console.log("Token:", token);  // Log the token
     await getDashboardDetails(token).then((res) => {
       setData(res.data);
       console.log(res.data);
@@ -86,6 +87,7 @@ const Dashboard = () => {
   const getTodaysWorkout = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
+    console.log("Token:", token);  // Log the token
     await getWorkouts(token, "").then((res) => {
       setTodaysWorkouts(res?.data?.todaysWorkouts);
       console.log(res.data);
@@ -96,6 +98,7 @@ const Dashboard = () => {
   const addNewWorkout = async () => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
+    console.log("Token:", token);  // Log the token
     await addWorkout(token, { workoutString: workout })
       .then((res) => {
         dashboardData();
