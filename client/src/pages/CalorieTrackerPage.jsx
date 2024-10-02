@@ -19,6 +19,14 @@ const CalorieTrackerPage = () => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
+  const preventNegativeInput = (e) => {
+    if (e.key === "-" || e.key === "e") {
+      e.preventDefault();
+    }
+  };
+
+  const today = new Date().toLocaleDateString('en-CA');
+  
   const updateChart = (labels, data) => {
     if (chartInstance.current) {
       chartInstance.current.data.labels = labels;
@@ -186,6 +194,8 @@ const CalorieTrackerPage = () => {
               value={age}
               onChange={(e) => setAge(e.target.value)}
               placeholder="Enter age"
+              onKeyDown={preventNegativeInput}
+              min="1"
             />
 
             <Label>Height (cm):</Label>
@@ -194,6 +204,8 @@ const CalorieTrackerPage = () => {
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               placeholder="Enter height in cm"
+              onKeyDown={preventNegativeInput}
+              min="1"
             />
 
             <Label>Current weight (Kg):</Label>
@@ -202,6 +214,8 @@ const CalorieTrackerPage = () => {
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
               placeholder="Enter current weight"
+              onKeyDown={preventNegativeInput}
+              min="1"
             />
 
             {goal !== "maintenance" && (
@@ -212,6 +226,8 @@ const CalorieTrackerPage = () => {
                   value={targetWeight}
                   onChange={(e) => setTargetWeight(e.target.value)}
                   placeholder="Enter target weight"
+                  onKeyDown={preventNegativeInput}
+                  min="1"
                 />
               </>
             )}
@@ -221,6 +237,7 @@ const CalorieTrackerPage = () => {
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
+              min={today}
             />
 
             <Label>Goal:</Label>
