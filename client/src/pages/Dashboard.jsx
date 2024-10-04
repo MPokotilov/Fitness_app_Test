@@ -77,7 +77,7 @@ const Dashboard = () => {
   const dashboardData = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token);  // Log the token
+    console.log("Token:", token); // Log the token
     await getDashboardDetails(token).then((res) => {
       setData(res.data);
       console.log(res.data);
@@ -87,7 +87,7 @@ const Dashboard = () => {
   const getTodaysWorkout = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token);  // Log the token
+    console.log("Token:", token); // Log the token
     await getWorkouts(token, "").then((res) => {
       setTodaysWorkouts(res?.data?.todaysWorkouts);
       console.log(res.data);
@@ -98,7 +98,7 @@ const Dashboard = () => {
   const addNewWorkout = async () => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token);  // Log the token
+    console.log("Token:", token); // Log the token
     await addWorkout(token, { workoutString: workout })
       .then((res) => {
         dashboardData();
@@ -120,13 +120,13 @@ const Dashboard = () => {
         <Title>Dashboard</Title>
         <FlexWrap>
           {counts.map((item) => (
-            <CountsCard item={item} data={data} />
+            <CountsCard key={item.id} item={item} data={data || {}} /> // Provide a default empty object
           ))}
         </FlexWrap>
 
         <FlexWrap>
-          <WeeklyStatCard data={data} />
-          <CategoryChart data={data} />
+          <WeeklyStatCard data={data || {}} />
+          <CategoryChart data={data || {}} />
           <AddWorkout
             workout={workout}
             setWorkout={setWorkout}
@@ -136,11 +136,15 @@ const Dashboard = () => {
         </FlexWrap>
 
         <Section>
-          <Title>Todays Workouts</Title>
+          <Title>Today's Workouts</Title>
           <CardWrapper>
-            {todaysWorkouts.map((workout) => (
-              <WorkoutCard workout={workout} />
-            ))}
+            {todaysWorkouts.length > 0 ? (
+              todaysWorkouts.map((workout) => (
+                <WorkoutCard key={workout._id} workout={workout} />
+              ))
+            ) : (
+              <p>No workouts logged for today.</p> // Display a message when no workouts are available
+            )}
           </CardWrapper>
         </Section>
       </Wrapper>

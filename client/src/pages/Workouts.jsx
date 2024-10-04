@@ -104,14 +104,18 @@ const Workouts = () => {
         </Left>
         <Right>
           <Section>
-            <SecTitle>Todays Workout</SecTitle>
+            <SecTitle>Workouts on {date || "Selected Date"}</SecTitle>
             {loading ? (
               <CircularProgress />
             ) : (
               <CardWrapper>
-                {todaysWorkouts.map((workout) => (
-                  <WorkoutCard workout={workout} />
-                ))}
+                {todaysWorkouts.length > 0 ? (
+                  todaysWorkouts.map((workout) => (
+                    <WorkoutCard key={workout._id} workout={workout} />
+                  ))
+                ) : (
+                  <p>No workouts logged for this date.</p>
+                )}
               </CardWrapper>
             )}
           </Section>
