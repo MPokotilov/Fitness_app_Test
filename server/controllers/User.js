@@ -81,21 +81,13 @@ export const getUserDashboard = async (req, res, next) => {
       return next(createError(404, "User not found"));
     }
 
-    const currentDateFormatted = new Date();
-    const startToday = new Date(
-      currentDateFormatted.getFullYear(),
-      currentDateFormatted.getMonth(),
-      currentDateFormatted.getDate()
-    );
-    const endToday = new Date(
-      currentDateFormatted.getFullYear(),
-      currentDateFormatted.getMonth(),
-      currentDateFormatted.getDate() + 1
-    );
+    const currentDate = new Date();
+    const startToday = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endToday = new Date(currentDate.setHours(23, 59, 59, 999));
 
-    //calculte total calories burnt
-    const totalCaloriesBurnt = await Workout.aggregate([
-      { $match: { user: user._id, date: { $gte: startToday, $lt: endToday } } },
+    // Calculate total calories burnt
+    const totalCaloriesResult = await Workout.aggregate([
+      { $match: { user: user._id, date: { $gte: startToday, $lte: endToday } } },
       {
         $group: {
           _id: null,
@@ -104,21 +96,20 @@ export const getUserDashboard = async (req, res, next) => {
       },
     ]);
 
-    //Calculate total no of workouts
+    const totalCaloriesBurnt = totalCaloriesResult.length > 0 ? totalCaloriesResult[0].totalCaloriesBurnt : 0;
+
+    // Calculate total number of workouts
     const totalWorkouts = await Workout.countDocuments({
       user: userId,
-      date: { $gte: startToday, $lt: endToday },
+      date: { $gte: startToday, $lte: endToday },
     });
 
-    //Calculate average calories burnt per workout
-    const avgCaloriesBurntPerWorkout =
-      totalCaloriesBurnt.length > 0
-        ? totalCaloriesBurnt[0].totalCaloriesBurnt / totalWorkouts
-        : 0;
+    // Calculate average calories burnt per workout
+    const avgCaloriesBurntPerWorkout = totalWorkouts > 0 ? (totalCaloriesBurnt / totalWorkouts) : 0;
 
     // Fetch category of workouts
     const categoryCalories = await Workout.aggregate([
-      { $match: { user: user._id, date: { $gte: startToday, $lt: endToday } } },
+      { $match: { user: user._id, date: { $gte: startToday, $lte: endToday } } },
       {
         $group: {
           _id: "$category",
@@ -127,68 +118,51 @@ export const getUserDashboard = async (req, res, next) => {
       },
     ]);
 
-    //Format category data for pie chart
-
+    // Format category data for pie chart
     const pieChartData = categoryCalories.map((category, index) => ({
       id: index,
       value: category.totalCaloriesBurnt,
       label: category._id,
     }));
 
+    // Prepare weekly calories burnt data
     const weeks = [];
     const caloriesBurnt = [];
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(
-        currentDateFormatted.getTime() - i * 24 * 60 * 60 * 1000
-      );
+      const date = new Date();
+      date.setDate(date.getDate() - i);
       weeks.push(`${date.getDate()}th`);
 
-      const startOfDay = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      );
-      const endOfDay = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate() + 1
-      );
+      const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 
       const weekData = await Workout.aggregate([
         {
           $match: {
             user: user._id,
-            date: { $gte: startOfDay, $lt: endOfDay },
+            date: { $gte: startOfDay, $lte: endOfDay },
           },
         },
         {
           $group: {
-            _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+            _id: null,
             totalCaloriesBurnt: { $sum: "$caloriesBurned" },
           },
         },
-        {
-          $sort: { _id: 1 }, // Sort by date in ascending order
-        },
       ]);
 
-      caloriesBurnt.push(
-        weekData[0]?.totalCaloriesBurnt ? weekData[0]?.totalCaloriesBurnt : 0
-      );
+      caloriesBurnt.push(weekData.length > 0 ? weekData[0].totalCaloriesBurnt : 0);
     }
 
     return res.status(200).json({
-      totalCaloriesBurnt:
-        totalCaloriesBurnt.length > 0
-          ? totalCaloriesBurnt[0].totalCaloriesBurnt
-          : 0,
-      totalWorkouts: totalWorkouts,
-      avgCaloriesBurntPerWorkout: avgCaloriesBurntPerWorkout,
+      totalCaloriesBurnt,
+      totalWorkouts,
+      avgCaloriesBurntPerWorkout,
       totalWeeksCaloriesBurnt: {
-        weeks: weeks,
+        weeks,
         caloriesBurned: caloriesBurnt,
       },
-      pieChartData: pieChartData,
+      pieChartData,
     });
   } catch (err) {
     console.log('Error fetching user dashboard:', err);
@@ -196,31 +170,25 @@ export const getUserDashboard = async (req, res, next) => {
   }
 };
 
+
 export const getWorkoutsByDate = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     const user = await User.findById(userId);
-    let date = req.query.date ? new Date(req.query.date) : new Date();
+    const date = req.query.date ? new Date(req.query.date) : new Date();
     if (!user) {
       return next(createError(404, "User not found"));
     }
-    const startOfDay = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    );
-    const endOfDay = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate() + 1
-    );
+    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
 
     const todaysWorkouts = await Workout.find({
-      userId: userId,
-      date: { $gte: startOfDay, $lt: endOfDay },
+      user: userId,
+      date: { $gte: startOfDay, $lte: endOfDay },
     });
+
     const totalCaloriesBurnt = todaysWorkouts.reduce(
-      (total, workout) => total + workout.caloriesBurned,
+      (total, workout) => total + (workout.caloriesBurned || 0),
       0
     );
 
@@ -229,6 +197,7 @@ export const getWorkoutsByDate = async (req, res, next) => {
     next(err);
   }
 };
+
 
 export const addWorkout = async (req, res, next) => {
   try {
