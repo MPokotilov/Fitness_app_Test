@@ -35,17 +35,16 @@ const DateInput = styled.input`
 `;
 
 const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
-  const [date, setDate] = useState("");  // New state to track selected date
+  const [date, setDate] = useState("");
 
   const handleAddWorkout = () => {
-    addNewWorkout(date);  // Pass the selected date to the parent function
+    addNewWorkout(date); 
   };
 
   return (
     <Card>
       <Title>Add New Workout</Title>
 
-      {/* Date input for selecting the workout date */}
       <DateInput
         type="date"
         value={date}
