@@ -6,7 +6,7 @@ import WeeklyStatCard from "../components/cards/WeeklyStatCard";
 import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
-import { addWorkout, getDashboardDetails, getWorkouts } from "../api";
+import { addWorkout, getDashboardDetails, getWorkouts, getPreviousDayDetails} from "../api";
 
 const Container = styled.div`
   flex: 1;
@@ -66,6 +66,7 @@ const CardWrapper = styled.div`
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
+  const [prevData, setPrevData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
   const [workout, setWorkout] = useState(`#Legs
@@ -78,9 +79,17 @@ Back Squat
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
     console.log("Token:", token); // Log the token
+
+    // Fetch current day data
     await getDashboardDetails(token).then((res) => {
       setData(res.data);
-      console.log(res.data);
+      console.log("Current day data:", res.data);
+    });
+
+    // Fetch previous day data
+    await getPreviousDayDetails(token).then((res) => {
+      setPrevData(res.data);  // Store previous day data
+      console.log("Previous day data:", res.data);
       setLoading(false);
     });
   };
@@ -95,11 +104,10 @@ Back Squat
     });
   };
 
-  const addNewWorkout = async () => {
+  const addNewWorkout = async (selectedDate) => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token); // Log the token
-    await addWorkout(token, { workoutString: workout })
+    await addWorkout(token, { workoutString: workout }, selectedDate)
       .then((res) => {
         dashboardData();
         getTodaysWorkout();
@@ -107,8 +115,10 @@ Back Squat
       })
       .catch((err) => {
         alert(err);
+        setButtonLoading(false);
       });
   };
+  
 
   useEffect(() => {
     dashboardData();
@@ -119,10 +129,11 @@ Back Squat
       <Wrapper>
         <Title>Dashboard</Title>
         <FlexWrap>
-          {counts.map((item) => (
-            <CountsCard key={item.id} item={item} data={data || {}} /> // Provide a default empty object
-          ))}
+            {counts.map((item) => (
+                <CountsCard key={item.id} item={item} data={data || {}} prevData={prevData || {}} /> 
+            ))}
         </FlexWrap>
+
 
         <FlexWrap>
           <WeeklyStatCard data={data || {}} />

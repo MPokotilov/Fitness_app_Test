@@ -26,10 +26,33 @@ const Title = styled.div`
   }
 `;
 
+const DateInput = styled.input`
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => theme.text_primary + 20};
+  border-radius: 8px;
+  margin-bottom: 10px;
+`;
+
 const AddWorkout = ({ workout, setWorkout, addNewWorkout, buttonLoading }) => {
+  const [date, setDate] = useState("");  // New state to track selected date
+
+  const handleAddWorkout = () => {
+    addNewWorkout(date);  // Pass the selected date to the parent function
+  };
+
   return (
     <Card>
       <Title>Add New Workout</Title>
+
+      {/* Date input for selecting the workout date */}
+      <DateInput
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        placeholder="Select a date"
+      />
+
       <TextInput
         label="Workout"
         textArea
@@ -45,10 +68,11 @@ Duration`}
         value={workout}
         handelChange={(e) => setWorkout(e.target.value)}
       />
+
       <Button
         text="Add Workout"
         small
-        onClick={() => addNewWorkout()}
+        onClick={handleAddWorkout}
         isLoading={buttonLoading}
         isDisabled={buttonLoading}
       />
