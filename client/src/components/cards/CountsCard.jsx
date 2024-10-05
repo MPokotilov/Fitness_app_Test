@@ -79,27 +79,41 @@ const Desc = styled.div`
     font-size: 12px;
   }
 `;
-const CountsCard = ({ item, data }) => {
-  const value = data && data[item.key] !== undefined && data[item.key] !== null
-    ? data[item.key]
-    : 0;
-
-  return (
-    <Card>
-      <Left>
-        <Title>{item.name}</Title>
-        <Value>
-          {parseFloat(value).toFixed(2)}
-          <Unit>{item.unit}</Unit>
-          <Span positive>(+0%)</Span>
-        </Value>
-        <Desc>{item.desc}</Desc>
-      </Left>
-      <Icon color={item.color} bg={item.lightColor}>
-        {item.icon}
-      </Icon>
-    </Card>
-  );
-};
+const CountsCard = ({ item, data, prevData }) => {
+    const value = data && data[item.key] !== undefined && data[item.key] !== null
+      ? data[item.key]
+      : 0;
+  
+    const prevValue = prevData && prevData[item.key] !== undefined && prevData[item.key] !== null
+      ? prevData[item.key]
+      : 0;
+  
+    const percentageChange = prevValue !== 0
+      ? ((value - prevValue) / prevValue) * 100
+      : 0;
+  
+    return (
+      <Card>
+        <Left>
+          <Title>{item.name}</Title>
+          <Value>
+            {parseFloat(value).toFixed(2)}
+            <Unit>{item.unit}</Unit>
+            <Span positive={percentageChange >= 0}>
+              {percentageChange >= 0
+                ? `(+${percentageChange.toFixed(2)}%)`
+                : `(${percentageChange.toFixed(2)}%)`}
+            </Span>
+          </Value>
+          <Desc>{item.desc}</Desc>
+        </Left>
+        <Icon color={item.color} bg={item.lightColor}>
+          {item.icon}
+        </Icon>
+      </Card>
+    );
+  };
+  
+  
 
 export default CountsCard;
