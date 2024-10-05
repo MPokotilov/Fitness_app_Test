@@ -18,13 +18,66 @@ const CalorieTrackerPage = () => {
 
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const cyclistRef = useRef(null);
+
+  const [animationData, setAnimationData] = useState([]);
 
   const updateChart = (labels, data) => {
     if (chartInstance.current) {
       chartInstance.current.data.labels = labels;
       chartInstance.current.data.datasets[0].data = data;
       chartInstance.current.update();
+
+      // After updating the chart, start the animation
+      animateCyclist();
     }
+  };
+
+  const animateCyclist = () => {
+    if (!chartInstance.current || !cyclistRef.current) return;
+
+    const datasetMeta = chartInstance.current.getDatasetMeta(0);
+    const points = datasetMeta.data;
+
+    if (points.length === 0) return;
+
+    // Extract x and y positions of the data points
+    const positions = points.map(point => ({
+      x: point.getProps(['x'], true).x,
+      y: point.getProps(['y'], true).y,
+    }));
+
+    setAnimationData(positions);
+
+    let frame = 0;
+    const totalFrames = 200; // Total animation frames
+
+    const animate = () => {
+      if (frame >= totalFrames) return;
+
+      const progress = frame / totalFrames;
+      const totalPoints = positions.length - 1;
+      const currentIndex = Math.floor(progress * totalPoints);
+      const t = (progress * totalPoints) % 1;
+
+      if (currentIndex >= totalPoints) return;
+
+      const currentPoint = positions[currentIndex];
+      const nextPoint = positions[currentIndex + 1];
+
+      // Linear interpolation between points
+      const x = currentPoint.x + (nextPoint.x - currentPoint.x) * t;
+      const y = currentPoint.y + (nextPoint.y - currentPoint.y) * t;
+
+      // Position the cyclist image relative to the chart container
+      cyclistRef.current.style.left = `${x - 25}px`; // Adjust for image width
+      cyclistRef.current.style.top = `${y - 25}px`;  // Adjust for image height
+
+      frame++;
+      requestAnimationFrame(animate);
+    };
+
+    animate();
   };
 
   useEffect(() => {
@@ -40,10 +93,10 @@ const CalorieTrackerPage = () => {
         labels: [], 
         datasets: [
           {
-            label: "Weight Loss Progress",
+            label: "Weight Progress",
             data: [],
-            borderColor: "rgb(75, 192, 192)",
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "#4e73df",
+            backgroundColor: "rgba(78, 115, 223, 0.1)",
             fill: true,
             tension: 0.4,
           },
@@ -51,6 +104,7 @@ const CalorieTrackerPage = () => {
       },
       options: {
         maintainAspectRatio: false,
+        animation: false, // Disable Chart.js animations
         scales: {
           x: {
             title: {
@@ -64,6 +118,7 @@ const CalorieTrackerPage = () => {
               display: true,
               text: 'Weight (kg)',
             },
+            reverse: false, // Do not reverse the y-axis
           },
         },
         plugins: {
@@ -83,9 +138,10 @@ const CalorieTrackerPage = () => {
 
   const calculateDailyCalories = (event) => {
     event.preventDefault(); 
+    setErrorMessage(""); // Clear previous error messages
 
     if (!currentWeight || !targetWeight || !targetDate || !age || !height || !gender || !goal) {
-      alert("Please fill out all fields.");
+      setErrorMessage("Please fill out all fields.");
       return;
     }
 
@@ -97,15 +153,15 @@ const CalorieTrackerPage = () => {
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
     if (daysDiff <= 0) {
-      alert("Please select a future date.");
+      setErrorMessage("Please select a future date.");
       return;
     }
 
     if (goal === "weight_loss" && targetW >= currentW) {
-      alert("Target weight must be less than current weight for weight loss.");
+      setErrorMessage("Target weight must be less than current weight for weight loss.");
       return;
     } else if (goal === "weight_gain" && targetW <= currentW) {
-      alert("Target weight must be greater than current weight for weight gain.");
+      setErrorMessage("Target weight must be greater than current weight for weight gain.");
       return;
     }
 
@@ -119,35 +175,34 @@ const CalorieTrackerPage = () => {
       BMR = (10 * currentW) + (6.25 * heightNum) - (5 * ageNum) - 161;
     }
 
-    
     const adjustedBMR = BMR * activityLevel;
 
     let dailyCalories;
-    const weightDifference = currentW - targetW;
+    const weightDifference = targetW - currentW;
     const monthsDiff = targetD.getMonth() - today.getMonth() + (12 * (targetD.getFullYear() - today.getFullYear()));
 
     if (goal === "weight_loss") {
       const maxDeficit = adjustedBMR * 0.3;
-      const totalCaloriesToBurn = weightDifference * 7700;
+      const totalCaloriesToBurn = (currentW - targetW) * 7700;
       const dailyCalorieDeficit = totalCaloriesToBurn / daysDiff;
 
       if (dailyCalorieDeficit > maxDeficit) {
-        alert("The selected period is too short for healthy weight loss. Please choose a longer period.");
+        setErrorMessage("The selected period is too short for healthy weight loss. Please choose a longer period.");
         return;
       }
 
       dailyCalories = adjustedBMR - dailyCalorieDeficit;
     } else if (goal === "weight_gain") {
       const maxSurplus = adjustedBMR * 0.3;
-      const totalCaloriesToGain = weightDifference * 7700;
+      const totalCaloriesToGain = (targetW - currentW) * 7700;
       const dailyCalorieSurplus = totalCaloriesToGain / daysDiff;
 
       if (dailyCalorieSurplus > maxSurplus) {
-        alert("The selected period is too short for healthy weight gain. Please choose a longer period.");
+        setErrorMessage("The selected period is too short for healthy weight gain. Please choose a longer period.");
         return;
       }
 
-      dailyCalories = adjustedBMR - dailyCalorieSurplus;
+      dailyCalories = adjustedBMR + dailyCalorieSurplus;
     } else {
       dailyCalories = adjustedBMR;
     }
@@ -161,7 +216,7 @@ const CalorieTrackerPage = () => {
     });
 
     const weightData = Array.from({ length: monthsDiff + 1 }, (_, i) => {
-      return currentW - (i / monthsDiff) * weightDifference;
+      return currentW + (weightDifference * (i / monthsDiff));
     });
 
     updateChart(labels, weightData);
@@ -171,7 +226,7 @@ const CalorieTrackerPage = () => {
     <Container>
       <Card>
         <ContentContainer>
-          <Form onSubmit={calculateDailyCalories}> {}
+          <Form onSubmit={calculateDailyCalories}>
             <Title>Calorie Tracker</Title>
             
             <Label>Gender:</Label>
@@ -230,7 +285,6 @@ const CalorieTrackerPage = () => {
               <option value="weight_gain">Weight Gain</option>
             </StyledSelect>
 
-            
             <Label>Activity Level:</Label>
             <StyledSelect value={activityLevel} onChange={(e) => setActivityLevel(parseFloat(e.target.value))}>
               <option value="1.2">Sedentary (little or no exercise)</option>
@@ -240,6 +294,9 @@ const CalorieTrackerPage = () => {
               <option value="1.9">Super active (very hard exercise/sports & a physical job)</option>
             </StyledSelect>
 
+            {/* Display error message here */}
+            {errorMessage && <Error>{errorMessage}</Error>}
+
             <Button type="submit">Calculate</Button>
 
             {dailyCalories && (
@@ -248,8 +305,10 @@ const CalorieTrackerPage = () => {
           </Form>
 
           <ChartContainer>
-            <canvas ref={chartRef}></canvas>
-            <CyclistImage src={cyclistGif} alt="Cyclist animation" />
+            <ChartWrapper>
+              <canvas ref={chartRef}></canvas>
+              <CyclistImage ref={cyclistRef} src={cyclistGif} alt="Cyclist animation" />
+            </ChartWrapper>
           </ChartContainer>
         </ContentContainer>
       </Card>
@@ -259,7 +318,6 @@ const CalorieTrackerPage = () => {
 
 export default CalorieTrackerPage;
 
-
 // Styles
 
 const Container = styled.div`
@@ -267,6 +325,7 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   overflow: scroll;
+  background-color: #f8f9fc;
 `;
 
 const Card = styled.div`
@@ -275,9 +334,8 @@ const Card = styled.div`
   align-items: center;
   padding: 20px;
   border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  
+  background-color: #ffffff;
+  box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
 `;
 
 const ContentContainer = styled.div`
@@ -285,69 +343,107 @@ const ContentContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  flex-wrap: wrap;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   flex: 1;
+  max-width: 500px;
 `;
 
 const Title = styled.h2`
   margin-bottom: 20px;
+  color: #4e73df;
 `;
 
 const Label = styled.label`
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #5a5c69;
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d3e2;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #5a5c69;
+  background-color: #eaecf4;
+
+  &:focus {
+    outline: none;
+    border-color: #4e73df;
+    background-color: #ffffff;
+  }
 `;
 
 const StyledSelect = styled.select`
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d3e2;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #5a5c69;
+  background-color: #eaecf4;
+
+  &:focus {
+    outline: none;
+    border-color: #4e73df;
+    background-color: #ffffff;
+  }
 `;
 
 const Button = styled.button`
-  padding: 10px;
-  background-color: #28a745;
+  padding: 12px 15px;
+  background-color: #4e73df;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #2e59d9;
+  }
 `;
 
 const Result = styled.p`
   margin-top: 20px;
   font-size: 18px;
+  color: #1cc88a;
+  font-weight: bold;
 `;
 
 const ChartContainer = styled.div`
   flex: 1;
   padding: 20px;
-  height: 600px;
-  width: 500px;
   position: relative;
   margin-top: 10%;
+  max-width: 600px;
+`;
+
+const ChartWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 400px;
 `;
 
 const CyclistImage = styled.img`
   position: absolute;
-  bottom: 90%;
-  right: 70%;
-  width: 100px;
+  width: 50px;
   height: auto;
+  left: 0;
+  top: 0;
 `;
 
 const Error = styled.p`
-  color: red;
-  margin-top: 10px;
+  color: #e74a3b;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-weight: bold;
 `;
