@@ -62,7 +62,7 @@ const WorkoutCard = ({ workout }) => {
       </Sets>
       <Flex>
         <Details>
-        <FitnessIcon style={{ width: '20px', height: '20px' }} />
+        <FitnessIcon style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px white)' }} />
           {workout?.weight} kg
         </Details>
         <Details>
