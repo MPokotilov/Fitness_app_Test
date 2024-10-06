@@ -76,7 +76,7 @@ const CalorieTrackerPage = () => {
 
       if (copCarRef.current) {
         copCarRef.current.style.left = `${x - 100}px`;  // Move cop cars slightly behind the cyclist
-        copCarRef.current.style.top = `${y - 100}px`;
+        copCarRef.current.style.top = `${y - 90}px`;
       }
 
       frame++;
