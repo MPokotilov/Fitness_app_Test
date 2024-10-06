@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import styled, { useTheme } from "styled-components"; // Import useTheme
+import styled, { useTheme } from "styled-components"; 
 import Chart from "chart.js/auto";
 import cyclistGif from './bicyclist.gif';
+import copCarGif from './car.gif';  // Assuming you have a cop car GIF
 
 const CalorieTrackerPage = () => {
-  const theme = useTheme(); // Get the current theme at the top level of the component
+  const theme = useTheme();
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
   const [targetDate, setTargetDate] = useState("");
@@ -20,8 +21,10 @@ const CalorieTrackerPage = () => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const cyclistRef = useRef(null);
+  const copCarRef = useRef(null); // Reference for the cop car
 
   const [animationData, setAnimationData] = useState([]);
+  const [showCops, setShowCops] = useState(false); // Control to show/hide cop cars
 
   const updateChart = (labels, data) => {
     if (chartInstance.current) {
@@ -30,6 +33,7 @@ const CalorieTrackerPage = () => {
       chartInstance.current.update();
 
       animateCyclist();
+      setShowCops(true);  // Show cop cars when the chart updates
     }
   };
 
@@ -68,7 +72,12 @@ const CalorieTrackerPage = () => {
       const y = currentPoint.y + (nextPoint.y - currentPoint.y) * t;
 
       cyclistRef.current.style.left = `${x - 25}px`;
-      cyclistRef.current.style.top = `${y - 25}px`; 
+      cyclistRef.current.style.top = `${y - 25}px`;
+
+      if (copCarRef.current) {
+        copCarRef.current.style.left = `${x - 100}px`;  // Move cop cars slightly behind the cyclist
+        copCarRef.current.style.top = `${y - 100}px`;
+      }
 
       frame++;
       requestAnimationFrame(animate);
@@ -92,8 +101,8 @@ const CalorieTrackerPage = () => {
           {
             label: "Weight Progress",
             data: [],
-            borderColor: theme.primary, // Use the primary color from the theme
-            backgroundColor: theme.bgLight + "80", // Semi-transparent version of the theme's background light color
+            borderColor: theme.primary, 
+            backgroundColor: theme.bgLight + "80", 
             fill: true,
             tension: 0.4,
           },
@@ -107,13 +116,13 @@ const CalorieTrackerPage = () => {
             title: {
               display: true,
               text: 'Month',
-              color: theme.text_primary, // Use primary text color from the theme
+              color: theme.text_primary,
             },
             ticks: {
-              color: theme.text_primary, // x-axis ticks should use the primary text color
+              color: theme.text_primary,
             },
             grid: {
-              color: theme.text_secondary + "80", // Lighter grid lines using secondary text color from the theme
+              color: theme.text_secondary + "80",
             },
           },
           y: {
@@ -121,20 +130,20 @@ const CalorieTrackerPage = () => {
             title: {
               display: true,
               text: 'Weight (kg)',
-              color: theme.text_primary, // y-axis title using primary text color from the theme
+              color: theme.text_primary,
             },
             ticks: {
-              color: theme.text_primary, // y-axis ticks using the primary text color
+              color: theme.text_primary,
             },
             grid: {
-              color: theme.text_secondary + "80", // Grid lines using the secondary text color
+              color: theme.text_secondary + "80",
             },
           },
         },
         plugins: {
           legend: {
             labels: {
-              color: theme.text_primary, // Legend label color using the theme's primary text color
+              color: theme.text_primary,
             },
           },
         },
@@ -143,12 +152,10 @@ const CalorieTrackerPage = () => {
   };
 
   useEffect(() => {
-    // Initialize or update chart when the component first loads
     initializeChart();
   }, []);
 
   useEffect(() => {
-    // Only update the chart colors when the theme changes
     if (chartInstance.current) {
       chartInstance.current.data.datasets[0].borderColor = theme.primary;
       chartInstance.current.data.datasets[0].backgroundColor = theme.bgLight + "80";
@@ -160,12 +167,12 @@ const CalorieTrackerPage = () => {
       chartInstance.current.options.scales.y.grid.color = theme.text_secondary + "80";
       chartInstance.current.options.plugins.legend.labels.color = theme.text_primary;
 
-      chartInstance.current.update(); // Apply the updates to the chart
+      chartInstance.current.update();
     }
-  }, [theme]); // Trigger when the theme changes
+  }, [theme]);
 
   const calculateDailyCalories = (event) => {
-    event.preventDefault(); 
+    event.preventDefault();
     setErrorMessage("");
 
     if (!currentWeight || !targetWeight || !targetDate || !age || !height || !gender || !goal) {
@@ -335,6 +342,9 @@ const CalorieTrackerPage = () => {
             <ChartWrapper>
               <canvas ref={chartRef}></canvas>
               <CyclistImage ref={cyclistRef} src={cyclistGif} alt="Cyclist animation" />
+              {showCops && (
+                <CopCarImage ref={copCarRef} src={copCarGif} alt="Cop Car Chasing" />
+              )}
             </ChartWrapper>
           </ChartContainer>
         </ContentContainer>
@@ -467,6 +477,14 @@ const ChartWrapper = styled.div`
 `;
 
 const CyclistImage = styled.img`
+  position: absolute;
+  width: 50px;
+  height: auto;
+  left: 0;
+  top: 0;
+`;
+
+const CopCarImage = styled.img`
   position: absolute;
   width: 50px;
   height: auto;
