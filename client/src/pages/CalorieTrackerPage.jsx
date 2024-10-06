@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components"; // Import useTheme
 import Chart from "chart.js/auto";
 import cyclistGif from './bicyclist.gif';
 
 const CalorieTrackerPage = () => {
+  const theme = useTheme(); // Get the current theme at the top level of the component
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
   const [targetDate, setTargetDate] = useState("");
@@ -28,7 +29,6 @@ const CalorieTrackerPage = () => {
       chartInstance.current.data.datasets[0].data = data;
       chartInstance.current.update();
 
-      // After updating the chart, start the animation
       animateCyclist();
     }
   };
@@ -41,7 +41,6 @@ const CalorieTrackerPage = () => {
 
     if (points.length === 0) return;
 
-    // Extract x and y positions of the data points
     const positions = points.map(point => ({
       x: point.getProps(['x'], true).x,
       y: point.getProps(['y'], true).y,
@@ -50,7 +49,7 @@ const CalorieTrackerPage = () => {
     setAnimationData(positions);
 
     let frame = 0;
-    const totalFrames = 200; // Total animation frames
+    const totalFrames = 200;
 
     const animate = () => {
       if (frame >= totalFrames) return;
@@ -65,13 +64,11 @@ const CalorieTrackerPage = () => {
       const currentPoint = positions[currentIndex];
       const nextPoint = positions[currentIndex + 1];
 
-      // Linear interpolation between points
       const x = currentPoint.x + (nextPoint.x - currentPoint.x) * t;
       const y = currentPoint.y + (nextPoint.y - currentPoint.y) * t;
 
-      // Position the cyclist image relative to the chart container
-      cyclistRef.current.style.left = `${x - 25}px`; // Adjust for image width
-      cyclistRef.current.style.top = `${y - 25}px`;  // Adjust for image height
+      cyclistRef.current.style.left = `${x - 25}px`;
+      cyclistRef.current.style.top = `${y - 25}px`; 
 
       frame++;
       requestAnimationFrame(animate);
@@ -80,7 +77,7 @@ const CalorieTrackerPage = () => {
     animate();
   };
 
-  useEffect(() => {
+  const initializeChart = () => {
     const ctx = chartRef.current.getContext("2d");
 
     if (chartInstance.current) {
@@ -95,8 +92,8 @@ const CalorieTrackerPage = () => {
           {
             label: "Weight Progress",
             data: [],
-            borderColor: "#4e73df",
-            backgroundColor: "rgba(78, 115, 223, 0.1)",
+            borderColor: theme.primary, // Use the primary color from the theme
+            backgroundColor: theme.bgLight + "80", // Semi-transparent version of the theme's background light color
             fill: true,
             tension: 0.4,
           },
@@ -104,12 +101,19 @@ const CalorieTrackerPage = () => {
       },
       options: {
         maintainAspectRatio: false,
-        animation: false, // Disable Chart.js animations
+        animation: false, 
         scales: {
           x: {
             title: {
               display: true,
               text: 'Month',
+              color: theme.text_primary, // Use primary text color from the theme
+            },
+            ticks: {
+              color: theme.text_primary, // x-axis ticks should use the primary text color
+            },
+            grid: {
+              color: theme.text_secondary + "80", // Lighter grid lines using secondary text color from the theme
             },
           },
           y: {
@@ -117,28 +121,52 @@ const CalorieTrackerPage = () => {
             title: {
               display: true,
               text: 'Weight (kg)',
+              color: theme.text_primary, // y-axis title using primary text color from the theme
             },
-            reverse: false, // Do not reverse the y-axis
+            ticks: {
+              color: theme.text_primary, // y-axis ticks using the primary text color
+            },
+            grid: {
+              color: theme.text_secondary + "80", // Grid lines using the secondary text color
+            },
           },
         },
         plugins: {
           legend: {
-            onClick: () => {}, 
+            labels: {
+              color: theme.text_primary, // Legend label color using the theme's primary text color
+            },
           },
         },
       },
     });
+  };
 
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
-    };
+  useEffect(() => {
+    // Initialize or update chart when the component first loads
+    initializeChart();
   }, []);
+
+  useEffect(() => {
+    // Only update the chart colors when the theme changes
+    if (chartInstance.current) {
+      chartInstance.current.data.datasets[0].borderColor = theme.primary;
+      chartInstance.current.data.datasets[0].backgroundColor = theme.bgLight + "80";
+      chartInstance.current.options.scales.x.title.color = theme.text_primary;
+      chartInstance.current.options.scales.x.ticks.color = theme.text_primary;
+      chartInstance.current.options.scales.x.grid.color = theme.text_secondary + "80";
+      chartInstance.current.options.scales.y.title.color = theme.text_primary;
+      chartInstance.current.options.scales.y.ticks.color = theme.text_primary;
+      chartInstance.current.options.scales.y.grid.color = theme.text_secondary + "80";
+      chartInstance.current.options.plugins.legend.labels.color = theme.text_primary;
+
+      chartInstance.current.update(); // Apply the updates to the chart
+    }
+  }, [theme]); // Trigger when the theme changes
 
   const calculateDailyCalories = (event) => {
     event.preventDefault(); 
-    setErrorMessage(""); // Clear previous error messages
+    setErrorMessage("");
 
     if (!currentWeight || !targetWeight || !targetDate || !age || !height || !gender || !goal) {
       setErrorMessage("Please fill out all fields.");
@@ -294,7 +322,6 @@ const CalorieTrackerPage = () => {
               <option value="1.9">Super active (very hard exercise/sports & a physical job)</option>
             </StyledSelect>
 
-            {/* Display error message here */}
             {errorMessage && <Error>{errorMessage}</Error>}
 
             <Button type="submit">Calculate</Button>
@@ -325,7 +352,7 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   overflow: scroll;
-  background-color: #f8f9fc;
+  background-color: ${({ theme }) => theme.bg}; // Background color based on theme
 `;
 
 const Card = styled.div`
@@ -334,7 +361,7 @@ const Card = styled.div`
   align-items: center;
   padding: 20px;
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.card}; // Card background based on theme
   box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
 `;
 
@@ -355,13 +382,13 @@ const Form = styled.form`
 
 const Title = styled.h2`
   margin-bottom: 20px;
-  color: #4e73df;
+  color: ${({ theme }) => theme.primary}; // Adjusted for theme
 `;
 
 const Label = styled.label`
   margin-bottom: 5px;
   font-weight: bold;
-  color: #5a5c69;
+  color: ${({ theme }) => theme.text_primary}; // Adjusted for theme
 `;
 
 const Input = styled.input`
@@ -370,36 +397,42 @@ const Input = styled.input`
   border: 1px solid #d1d3e2;
   border-radius: 5px;
   font-size: 14px;
-  color: #5a5c69;
-  background-color: #eaecf4;
+  color: ${({ theme }) => theme.text_primary}; // Adjusted for theme
+  background-color: ${({ theme }) => theme.bgLight}; // Adjusted for theme
 
   &:focus {
     outline: none;
-    border-color: #4e73df;
-    background-color: #ffffff;
+    border-color: ${({ theme }) => theme.primary}; // Adjusted for theme
+    background-color: ${({ theme }) => theme.bgLight}; // Adjusted for theme
   }
 `;
 
 const StyledSelect = styled.select`
   padding: 12px 15px;
   margin-bottom: 15px;
-  border: 1px solid #d1d3e2;
+  border: 1px solid ${({ theme }) => theme.text_secondary}; // Border color from theme
   border-radius: 5px;
   font-size: 14px;
-  color: #5a5c69;
-  background-color: #eaecf4;
+  color: ${({ theme }) => theme.text_primary}; // Text color from theme
+  background-color: ${({ theme }) => theme.card}; // Background color from theme
 
   &:focus {
     outline: none;
-    border-color: #4e73df;
-    background-color: #ffffff;
+    border-color: ${({ theme }) => theme.primary}; // Focused border color from theme
+    background-color: ${({ theme }) => theme.bgLight}; // Focused background color from theme
+  }
+
+  option {
+    color: ${({ theme }) => theme.text_primary}; // Option text color from theme
+    background-color: ${({ theme }) => theme.bg}; // Option background color from theme
   }
 `;
 
+
 const Button = styled.button`
   padding: 12px 15px;
-  background-color: #4e73df;
-  color: white;
+  background-color: ${({ theme }) => theme.primary}; // Adjusted for theme
+  color: ${({ theme }) => theme.white}; // Adjusted for theme
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -408,14 +441,14 @@ const Button = styled.button`
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: #2e59d9;
+    background-color: ${({ theme }) => theme.secondary}; // Adjusted for theme
   }
 `;
 
 const Result = styled.p`
   margin-top: 20px;
   font-size: 18px;
-  color: #1cc88a;
+  color: ${({ theme }) => theme.green}; // Adjusted for theme
   font-weight: bold;
 `;
 
@@ -442,7 +475,7 @@ const CyclistImage = styled.img`
 `;
 
 const Error = styled.p`
-  color: #e74a3b;
+  color: ${({ theme }) => theme.red}; // Adjusted for theme
   margin-top: -10px;
   margin-bottom: 10px;
   font-weight: bold;

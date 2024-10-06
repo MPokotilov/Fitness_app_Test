@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { ThemeProvider, styled } from "styled-components";
-import { darkTheme } from "./utils/Themes";
+import { darkTheme, lightTheme20 } from "./utils/Themes"; // Import both themes
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Authentication from "./pages/Authentication";
 import { useSelector } from "react-redux";
 import Navbar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
-import CalorieTrackerPage from "./pages/CalorieTrackerPage"; 
+import CalorieTrackerPage from "./pages/CalorieTrackerPage";
+
 const Container = styled.div`
   width: 100%;
   height: 100vh;
@@ -21,22 +22,27 @@ const Container = styled.div`
 `;
 
 function App() {
-    const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
+
+  // State to manage the current theme
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  // Function to toggle between light and dark modes
+  const toggleTheme = () => {
+    setIsDarkMode((prevMode) => !prevMode);
+  };
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme20}>
       <BrowserRouter>
         {currentUser ? (
           <Container>
-            <Navbar currentUser={currentUser} />
+            {/* Pass the toggleTheme and isDarkMode to the Navbar */}
+            <Navbar currentUser={currentUser} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
             <Routes>
               <Route path="/" exact element={<Dashboard />} />
               <Route path="/workouts" exact element={<Workouts />} />
-              <Route
-                path="/calorie-tracker"
-                exact
-                element={<CalorieTrackerPage />}
-              />
+              <Route path="/calorie-tracker" exact element={<CalorieTrackerPage />} />
             </Routes>
           </Container>
         ) : (
