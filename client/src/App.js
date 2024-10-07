@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ThemeProvider, styled } from "styled-components";
-import { darkTheme, lightTheme20 } from "./utils/Themes"; // Import both themes
+import { darkTheme, lightTheme } from "./utils/Themes"; // Import both themes
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Authentication from "./pages/Authentication";
 import { useSelector } from "react-redux";
@@ -25,7 +25,7 @@ function App() {
   const { currentUser } = useSelector((state) => state.user);
 
   // State to manage the current theme
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Function to toggle between light and dark modes
   const toggleTheme = () => {
@@ -33,7 +33,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme20}>
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <BrowserRouter>
         {currentUser ? (
           <Container>

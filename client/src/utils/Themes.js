@@ -1,4 +1,4 @@
-export const lightTheme20 = {
+export const lightTheme = {
     bg: "#ECEFF1",                 // Light gray background
   bgLight: "#FFFFFF",            // White for light backgrounds
   primary: "#00ACC1",            // Cyan as the primary color
