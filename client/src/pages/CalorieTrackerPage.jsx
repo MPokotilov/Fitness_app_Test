@@ -468,6 +468,7 @@ const ChartContainer = styled.div`
   position: relative;
   margin-top: 10%;
   max-width: 600px;
+  min-width: 500px;
 `;
 
 const ChartWrapper = styled.div`
