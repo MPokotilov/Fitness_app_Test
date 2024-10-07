@@ -8,7 +8,10 @@ import { useSelector } from "react-redux";
 import Navbar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
-import CalorieTrackerPage from "./pages/CalorieTrackerPage"; 
+import CalorieTrackerPage from "./pages/CalorieTrackerPage";
+import BlogPage from "./pages/BlogPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
+
 const Container = styled.div`
   width: 100%;
   height: 100vh;
@@ -22,7 +25,7 @@ const Container = styled.div`
 `;
 
 function App() {
-    const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
 
   return (
     <ThemeProvider theme={lightTheme}>
@@ -33,12 +36,11 @@ function App() {
             <Routes>
               <Route path="/" exact element={<Dashboard />} />
               <Route path="/workouts" exact element={<Workouts />} />
-              <Route
-                path="/calorie-tracker"
-                exact
-                element={<CalorieTrackerPage />}
-              />
+              <Route path="/calorie-tracker" exact element={<CalorieTrackerPage />} />
+              <Route path="/blogs" exact element={<BlogPage />} />
+              <Route path="/blog/:id" exact element={<BlogDetailPage />} />
             </Routes>
+
           </Container>
         ) : (
           <Container>
