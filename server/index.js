@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user/", UserRoutes);
 // error handler
 app.use((err, req, res, next) => {
-  console.error("Server Error:", err);  // Log detailed error information
+  console.error("Server Error:", err); // Log detailed error information
   res.status(err.status || 500).json({
     success: false,
     status: err.status || 500,
@@ -22,11 +22,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 app.get("/", async (req, res) => {
-  res.status(200).json({
-    message: "Hello developers from GFG",
-  });
+  res.status(200).json({});
 });
 
 const connectDB = () => {
