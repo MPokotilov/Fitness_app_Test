@@ -15,6 +15,7 @@ const Container = styled.div`
   justify-content: center;
   padding: 22px 0px;
   overflow-y: scroll;
+
 `;
 const Wrapper = styled.div`
   flex: 1;
@@ -34,6 +35,7 @@ const Left = styled.div`
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
   border-radius: 14px;
   box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
+  background-color: ${({ theme }) => theme.chart_back};
 `;
 const Title = styled.div`
   font-weight: 600;

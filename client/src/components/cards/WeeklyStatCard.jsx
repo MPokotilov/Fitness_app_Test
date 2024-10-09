@@ -12,6 +12,7 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background-color: ${({ theme }) => theme.chart_back};
   @media (max-width: 600px) {
     padding: 16px;
   }

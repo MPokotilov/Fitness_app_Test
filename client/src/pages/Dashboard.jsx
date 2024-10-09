@@ -6,7 +6,7 @@ import WeeklyStatCard from "../components/cards/WeeklyStatCard";
 import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
-import { addWorkout, getDashboardDetails, getWorkouts } from "../api";
+import { addWorkout, getDashboardDetails, getWorkouts, getPreviousDayDetails } from "../api";
 
 const Container = styled.div`
   flex: 1;
@@ -16,6 +16,7 @@ const Container = styled.div`
   padding: 22px 0px;
   overflow-y: scroll;
 `;
+
 const Wrapper = styled.div`
   flex: 1;
   max-width: 1400px;
@@ -26,12 +27,14 @@ const Wrapper = styled.div`
     gap: 12px;
   }
 `;
+
 const Title = styled.div`
   padding: 0px 16px;
   font-size: 22px;
   color: ${({ theme }) => theme.text_primary};
   font-weight: 500;
 `;
+
 const FlexWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -42,16 +45,17 @@ const FlexWrap = styled.div`
     gap: 12px;
   }
 `;
+
 const Section = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0px 16px;
   gap: 22px;
-  padding: 0px 16px;
   @media (max-width: 600px) {
     gap: 12px;
   }
 `;
+
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -66,28 +70,40 @@ const CardWrapper = styled.div`
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
+  const [prevData, setPrevData] = useState();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
-  const [workout, setWorkout] = useState(`#Legs
--Back Squat
--5 setsX15 reps
--30 kg
--10 min`);
+
+  // Separate state fields for each workout input
+  const [date, setDate] = useState("");
+  const [category, setCategory] = useState("Back");
+  const [exerciseName, setExerciseName] = useState("");
+  const [sets, setSets] = useState("");
+  const [reps, setReps] = useState("");
+  const [weight, setWeight] = useState("");
+  const [time, setTime] = useState("");
 
   const dashboardData = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token); // Log the token
+    console.log("Token:", token);
+
     await getDashboardDetails(token).then((res) => {
       setData(res.data);
-      console.log(res.data);
+      console.log("Current day data:", res.data);
+    });
+
+    await getPreviousDayDetails(token).then((res) => {
+      setPrevData(res.data);
+      console.log("Previous day data:", res.data);
       setLoading(false);
     });
   };
+
   const getTodaysWorkout = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token); // Log the token
+    console.log("Token:", token);
     await getWorkouts(token, "").then((res) => {
       setTodaysWorkouts(res?.data?.todaysWorkouts);
       console.log(res.data);
@@ -98,8 +114,19 @@ const Dashboard = () => {
   const addNewWorkout = async () => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    console.log("Token:", token); // Log the token
-    await addWorkout(token, { workoutString: workout })
+
+    // Construct workout data from individual fields
+    const workoutData = {
+      date,
+      category,
+      exerciseName,
+      sets,
+      reps,
+      weight,
+      time,
+    };
+
+    await addWorkout(token, workoutData)
       .then((res) => {
         dashboardData();
         getTodaysWorkout();
@@ -107,6 +134,7 @@ const Dashboard = () => {
       })
       .catch((err) => {
         alert(err);
+        setButtonLoading(false);
       });
   };
 
@@ -114,13 +142,14 @@ const Dashboard = () => {
     dashboardData();
     getTodaysWorkout();
   }, []);
+
   return (
     <Container>
       <Wrapper>
         <Title>Dashboard</Title>
         <FlexWrap>
           {counts.map((item) => (
-            <CountsCard key={item.id} item={item} data={data || {}} /> // Provide a default empty object
+            <CountsCard key={item.id} item={item} data={data || {}} prevData={prevData || {}} />
           ))}
         </FlexWrap>
 
@@ -128,8 +157,20 @@ const Dashboard = () => {
           <WeeklyStatCard data={data || {}} />
           <CategoryChart data={data || {}} />
           <AddWorkout
-            workout={workout}
-            setWorkout={setWorkout}
+            date={date}
+            setDate={setDate}
+            category={category}
+            setCategory={setCategory}
+            exerciseName={exerciseName}
+            setExerciseName={setExerciseName}
+            sets={sets}
+            setSets={setSets}
+            reps={reps}
+            setReps={setReps}
+            weight={weight}
+            setWeight={setWeight}
+            time={time}
+            setTime={setTime}
             addNewWorkout={addNewWorkout}
             buttonLoading={buttonLoading}
           />
@@ -143,7 +184,7 @@ const Dashboard = () => {
                 <WorkoutCard key={workout._id} workout={workout} />
               ))
             ) : (
-              <p>No workouts logged for today.</p> // Display a message when no workouts are available
+              <p>No workouts logged for today.</p>
             )}
           </CardWrapper>
         </Section>
