@@ -88,9 +88,13 @@ const CountsCard = ({ item, data, prevData }) => {
       ? prevData[item.key]
       : 0;
   
-    const percentageChange = prevValue !== 0
-      ? ((value - prevValue) / prevValue) * 100
-      : 0;
+    let percentageChange;
+  
+    if (prevValue === 0) {
+      percentageChange = value > 0 ? 100 : 0; // 100% increase if current value is greater than 0, otherwise 0%
+    } else {
+      percentageChange = ((value - prevValue) / prevValue) * 100;
+    }
   
     return (
       <Card>
@@ -99,11 +103,13 @@ const CountsCard = ({ item, data, prevData }) => {
           <Value>
             {parseFloat(value).toFixed(2)}
             <Unit>{item.unit}</Unit>
-            <Span positive={percentageChange >= 0}>
-              {percentageChange >= 0
-                ? `(+${percentageChange.toFixed(2)}%)`
-                : `(${percentageChange.toFixed(2)}%)`}
-            </Span>
+            {percentageChange !== null && (
+              <Span positive={percentageChange >= 0}>
+                {percentageChange >= 0
+                  ? `(+${percentageChange.toFixed(2)}%)`
+                  : `(${percentageChange.toFixed(2)}%)`}
+              </Span>
+            )}
           </Value>
           <Desc>{item.desc}</Desc>
         </Left>
@@ -114,6 +120,6 @@ const CountsCard = ({ item, data, prevData }) => {
     );
   };
   
-  
+    
 
 export default CountsCard;
