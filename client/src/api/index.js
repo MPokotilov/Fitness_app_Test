@@ -26,7 +26,7 @@ export const getWorkouts = async (token, date) =>
   });
 
 // Add a new workout
-export const addWorkout = async (token, data, date = "") =>
-    API.post(`/user/workout`, { ...data, date }, {
+export const addWorkout = async (token, data) =>
+    API.post(`/user/workout`, { ...data }, {
       headers: { Authorization: `Bearer ${token}` },
     });
