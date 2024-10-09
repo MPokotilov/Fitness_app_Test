@@ -211,42 +211,66 @@ export const getUserDashboard = async (req, res, next) => {
   export const addWorkout = async (req, res, next) => {
     try {
       const userId = req.user?.id;
-      const { workoutString, date } = req.body;
+      const { date, category, exerciseName, sets, reps, weight, time } = req.body;
   
-      if (!workoutString) {
-        return next(createError(400, "Workout string is missing"));
-      }
-  
+      // Use today's date if no date is provided
       const workoutDate = date ? new Date(date) : new Date();
   
-      const parsedWorkouts = parseWorkoutString(workoutString);
+      console.log("Received Workout Data:", { date: workoutDate, category, exerciseName, sets, reps, weight, time });
   
-      for (const workout of parsedWorkouts) {
-        workout.caloriesBurned = calculateCaloriesBurnt(workout);
-        workout.user = userId;
-        workout.date = workoutDate;
-  
-        await Workout.updateOne(
-          {
-            user: userId,
-            workoutName: workout.workoutName,
-            date: {
-              $gte: new Date(workoutDate.setHours(0, 0, 0, 0)),
-              $lte: new Date(workoutDate.setHours(23, 59, 59, 999)),
-            },
-          },
-          { $set: workout },
-          { upsert: true }
-        );
+      // Validation for required fields
+      if (!category) {
+        return next(createError(400, "Category is required"));
+      }
+      if (!exerciseName) {
+        return next(createError(400, "Exercise name is required"));
+      }
+      if (sets === undefined) {
+        return next(createError(400, "Number of sets is required"));
+      }
+      if (reps === undefined) {
+        return next(createError(400, "Number of reps is required"));
+      }
+      if (weight === undefined) {
+        return next(createError(400, "Weight is required"));
+      }
+      if (time === undefined) {
+        return next(createError(400, "Time is required"));
       }
   
-      return res.status(200).json({
-        message: "Workouts successfully added or updated.",
-      });
+      // Construct workout data object
+      const workoutData = {
+        user: userId,
+        date: workoutDate,
+        category,
+        workoutName: exerciseName,
+        sets: parseInt(sets),
+        reps: parseInt(reps),
+        weight: parseFloat(weight),
+        duration: parseFloat(time),
+        caloriesBurned: calculateCaloriesBurnt({ weight: parseFloat(weight), duration: parseFloat(time) }),
+      };
+  
+      // Insert or update workout
+      await Workout.updateOne(
+        {
+          user: userId,
+          workoutName: exerciseName,
+          date: {
+            $gte: new Date(workoutDate.setHours(0, 0, 0, 0)),
+            $lte: new Date(workoutDate.setHours(23, 59, 59, 999)),
+          },
+        },
+        { $set: workoutData },
+        { upsert: true }
+      );
+  
+      return res.status(200).json({ message: "Workout added or updated successfully." });
     } catch (err) {
       next(err);
     }
   };
+  
   
 
 const parseWorkoutString = (workoutString) => {
