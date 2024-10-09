@@ -25,7 +25,7 @@ const Container = styled.div`
 
 function App() {
   const { currentUser } = useSelector((state) => state.user);
-  const { currentUser } = useSelector((state) => state.user);
+  
 
   // State to manage the current theme
   const [isDarkMode, setIsDarkMode] = useState(false);
