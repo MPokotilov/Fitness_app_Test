@@ -44,7 +44,28 @@ export const UserRegister = async (req, res, next) => {
       return next(error);
     }
   };
+
+export const deleteWorkout = async (req, res, next) => {
+    try {
+        console.log(req.params);
+      const { workoutId } = req.params; // Capture workout ID from the URL
+      const userId = req.user?.id; // Get user ID from the JWT token
+      
+      // Verify if the workout belongs to the user and delete it
+      const result = await Workout.findOneAndDelete({
+        _id: workoutId,
+        user: userId,
+      });
   
+      if (!result) {
+        return res.status(404).json({ message: "Workout not found or not authorized" });
+      }
+  
+      res.status(200).json({ message: "Workout deleted successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };  
 
 export const UserLogin = async (req, res, next) => {
   try {
