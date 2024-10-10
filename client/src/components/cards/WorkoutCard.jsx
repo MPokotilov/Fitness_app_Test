@@ -1,7 +1,9 @@
 import { AccessTimeFilled } from "@mui/icons-material";
 import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
 import React from "react";
-import styled from "styled-components"; 
+import { useState } from "react";
+import styled from "styled-components";
+import ConfirmationModal from "./ConfirmationModal"; 
 
 const Card = styled.div`
   flex: 1;
@@ -64,15 +66,25 @@ const DeleteButton = styled.button`
 `;
 
 const WorkoutCard = ({ workout, onDelete }) => {
-    const handleDelete = () => {
-      if (window.confirm("Are you sure you want to delete this workout?")) {
-        onDelete(workout._id); // Simply call the onDelete prop with the workout ID
-      }
+    const [modalOpen, setModalOpen] = useState(false);
+  
+    const handleDeleteClick = () => {
+      setModalOpen(true);
+    };
+  
+    const handleConfirmDelete = () => {
+      setModalOpen(false);
+      onDelete(workout._id);
+    };
+  
+    const handleCancelDelete = () => {
+      setModalOpen(false);
     };
   
     return (
-      <Card>
-        <DeleteButton onClick={handleDelete}>X</DeleteButton>
+    <>
+        <Card>
+        <DeleteButton onClick={handleDeleteClick}>X</DeleteButton>
         <Category>#{workout?.category}</Category>
         <Name>{workout?.workoutName}</Name>
         <Sets>
@@ -95,7 +107,13 @@ const WorkoutCard = ({ workout, onDelete }) => {
           </Details>
         </Flex>
       </Card>
-    );
-  };
+      <ConfirmationModal
+        open={modalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
+  );
+};
   
   export default WorkoutCard;
