@@ -1,7 +1,9 @@
 import { AccessTimeFilled } from "@mui/icons-material";
 import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
 import React from "react";
+import { useState } from "react";
 import styled from "styled-components";
+import ConfirmationModal from "./ConfirmationModal"; 
 
 const Card = styled.div`
   flex: 1;
@@ -52,26 +54,66 @@ const Details = styled.div`
   gap: 6px;
 `;
 
-const WorkoutCard = ({ workout }) => {
-  return (
-    <Card>
-      <Category>#{workout?.category}</Category>
-      <Name>{workout?.workoutName}</Name>
-      <Sets>
-        Count: {workout?.sets} sets X {workout?.reps} reps
-      </Sets>
-      <Flex>
-        <Details>
-        <FitnessIcon style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px white)' }} />
-          {workout?.weight} kg
-        </Details>
-        <Details>
-          <AccessTimeFilled sx={{ fontSize: "20px" }} />
-          {workout?.duration} min
-        </Details>
-      </Flex>
-    </Card>
+const DeleteButton = styled.button`
+  background: red;
+  color: ${({ theme }) => theme.primary};
+  background: ${({ theme }) => theme.primary + 20};
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-end;
+`;
+
+const WorkoutCard = ({ workout, onDelete }) => {
+    const [modalOpen, setModalOpen] = useState(false);
+  
+    const handleDeleteClick = () => {
+      setModalOpen(true);
+    };
+  
+    const handleConfirmDelete = () => {
+      setModalOpen(false);
+      onDelete(workout._id);
+    };
+  
+    const handleCancelDelete = () => {
+      setModalOpen(false);
+    };
+  
+    return (
+    <>
+        <Card>
+        <DeleteButton onClick={handleDeleteClick}>X</DeleteButton>
+        <Category>#{workout?.category}</Category>
+        <Name>{workout?.workoutName}</Name>
+        <Sets>
+          Count: {workout?.sets} sets X {workout?.reps} reps
+        </Sets>
+        <Flex>
+          <Details>
+            <FitnessIcon
+              style={{
+                width: "20px",
+                height: "20px",
+                filter: "drop-shadow(0 0 5px white)",
+              }}
+            />
+            {workout?.weight} kg
+          </Details>
+          <Details>
+            <AccessTimeFilled sx={{ fontSize: "20px" }} />
+            {workout?.duration} min
+          </Details>
+        </Flex>
+      </Card>
+      <ConfirmationModal
+        open={modalOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   );
 };
-
-export default WorkoutCard;
+  
+  export default WorkoutCard;

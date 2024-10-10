@@ -7,6 +7,7 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
 import { useDispatch } from "react-redux";
+import { deleteWorkout } from "../api";
 
 const Container = styled.div`
   flex: 1;
@@ -75,24 +76,36 @@ const SecTitle = styled.div`
 `;
 
 const Workouts = () => {
-  const dispatch = useDispatch();
-  const [todaysWorkouts, setTodaysWorkouts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState("");
-
-  const getTodaysWorkout = async () => {
-    setLoading(true);
-    const token = localStorage.getItem("fittrack-app-token");
-    await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
-      setTodaysWorkouts(res?.data?.todaysWorkouts);
-      console.log(res.data);
-      setLoading(false);
-    });
-  };
-
-  useEffect(() => {
-    getTodaysWorkout();
-  }, [date]);
+    const [todaysWorkouts, setTodaysWorkouts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState("");
+  
+    const getTodaysWorkout = async () => {
+      setLoading(true);
+      const token = localStorage.getItem("fittrack-app-token");
+      await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
+        setTodaysWorkouts(res?.data?.todaysWorkouts);
+        console.log(res.data);
+        setLoading(false);
+      });
+    };
+  
+    const handleDelete = async (workoutId) => {
+      const token = localStorage.getItem("fittrack-app-token");
+      try {
+        await deleteWorkout(token, workoutId);
+        setTodaysWorkouts((prevWorkouts) =>
+          prevWorkouts.filter((workout) => workout._id !== workoutId)
+        );
+      } catch (err) {
+        console.error("Error deleting workout:", err);
+        alert("Failed to delete workout");
+      }
+    };
+  
+    useEffect(() => {
+      getTodaysWorkout();
+    }, [date]);
   return (
     <Container>
       <Wrapper>
@@ -113,7 +126,11 @@ const Workouts = () => {
               <CardWrapper>
                 {todaysWorkouts.length > 0 ? (
                   todaysWorkouts.map((workout) => (
-                    <WorkoutCard key={workout._id} workout={workout} />
+                    <WorkoutCard
+                      key={workout._id}
+                      workout={workout}
+                      onDelete={handleDelete} // Pass the handleDelete function
+                    />
                   ))
                 ) : (
                   <p>No workouts logged for this date.</p>

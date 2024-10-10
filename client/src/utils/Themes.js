@@ -25,6 +25,8 @@ export const lightTheme = {
   popup_text_secondary: "#616161", // Medium gray for secondary popup text
   output_node: "#90A4AE",
   red: "#FF5252",
+  action_confirm_button: "#00ACC1",
+  input: "#3c3c3c",
   };
   
   export const darkTheme = {
@@ -54,6 +56,8 @@ export const lightTheme = {
     popup_text_secondary: "#B3B3B3", // Light Gray for Secondary Popup Text
     output_node: "#81D4FA",        // Light Blue for Output Nodes
     chart_back: "#4A3C75",
+    action_confirm_button: "#03DAC6",
+    input: "#cdcdcd",
   
     // New additions for chart-specific text:
     chart_text: "#FFFFFF",         // White text for chart labels for good contrast on dark background

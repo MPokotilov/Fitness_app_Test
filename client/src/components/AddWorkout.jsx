@@ -35,7 +35,9 @@ const Label = styled.label`
 const DateInput = styled.input`
   padding: 8px;
   font-size: 14px;
+  color: ${({ theme }) => theme.input};
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
+  background-color: ${({ theme }) => theme.bgLight};
   border-radius: 8px;
   margin-bottom: 10px;
 `;
@@ -43,7 +45,9 @@ const DateInput = styled.input`
 const Select = styled.select`
   padding: 8px;
   font-size: 14px;
+  color: ${({ theme }) => theme.input};
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
+  background-color: ${({ theme }) => theme.bgLight};
   border-radius: 8px;
   margin-bottom: 10px;
 `;
@@ -51,7 +55,9 @@ const Select = styled.select`
 const Input = styled.input`
   padding: 8px;
   font-size: 14px;
+  color: ${({ theme }) => theme.input};
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
+  background-color: ${({ theme }) => theme.bgLight};
   border-radius: 8px;
   
 `;
@@ -59,8 +65,10 @@ const Input = styled.input`
 const InputSets = styled.input`
   padding: 8px;
   font-size: 14px;
+  color: ${({ theme }) => theme.input};
   border: 1px solid ${({ theme }) => theme.text_primary + 20};
   border-radius: 8px;
+  background-color: ${({ theme }) => theme.bgLight};
   
 `;
 

@@ -6,7 +6,7 @@ import WeeklyStatCard from "../components/cards/WeeklyStatCard";
 import CategoryChart from "../components/cards/CategoryChart";
 import AddWorkout from "../components/AddWorkout";
 import WorkoutCard from "../components/cards/WorkoutCard";
-import { addWorkout, getDashboardDetails, getWorkouts, getPreviousDayDetails } from "../api";
+import { addWorkout, getDashboardDetails, getWorkouts, getPreviousDayDetails, deleteWorkout } from "../api";
 
 const Container = styled.div`
   flex: 1;
@@ -111,6 +111,19 @@ const Dashboard = () => {
     });
   };
 
+  const handleDelete = async (workoutId) => {
+    const token = localStorage.getItem("fittrack-app-token");
+    try {
+      await deleteWorkout(token, workoutId);
+      setTodaysWorkouts((prevWorkouts) =>
+        prevWorkouts.filter((workout) => workout._id !== workoutId)
+      );
+    } catch (err) {
+      console.error("Error deleting workout:", err);
+      alert("Failed to delete workout");
+    }
+  };
+
   const addNewWorkout = async () => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
@@ -177,11 +190,15 @@ const Dashboard = () => {
         </FlexWrap>
 
         <Section>
-          <Title>Today's Workouts</Title>
+        <Title>Today's Workouts</Title>
           <CardWrapper>
             {todaysWorkouts.length > 0 ? (
               todaysWorkouts.map((workout) => (
-                <WorkoutCard key={workout._id} workout={workout} />
+                <WorkoutCard
+                  key={workout._id}
+                  workout={workout}
+                  onDelete={handleDelete} // Pass the handleDelete function
+                />
               ))
             ) : (
               <p>No workouts logged for today.</p>

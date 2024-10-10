@@ -7,6 +7,7 @@ import {
   getWorkoutsByDate,
 } from "../controllers/User.js";
 import { verifyToken } from "../middleware/verifyToken.js";
+import { deleteWorkout } from "../controllers/User.js";
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.post("/signin", UserLogin);
 router.get("/dashboard", verifyToken, getUserDashboard);
 router.get("/workout", verifyToken, getWorkoutsByDate);
 router.post("/workout", verifyToken, addWorkout);
+router.delete("/workout/:workoutId", verifyToken, deleteWorkout);
 
 export default router;

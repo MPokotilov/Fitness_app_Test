@@ -19,6 +19,12 @@ export const getPreviousDayDetails = async (token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+export const deleteWorkout = async (token, workoutId) =>
+    API.delete(`/user/workout/${workoutId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  
+
 // Get the workouts for a given date
 export const getWorkouts = async (token, date) =>
   API.get(`/user/workout${date}`, {
