@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import styled, { useTheme } from "styled-components"; 
 import Chart from "chart.js/auto";
 import cyclistGif from './bicyclist.gif';
-import copCarGif from './car.gif';  // Assuming you have a cop car GIF
+import copCarGif from './car.gif';
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+import enUS from "date-fns/locale/en-US";
+registerLocale("en-US", enUS);
 
 const CalorieTrackerPage = () => {
   const theme = useTheme();
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
-  const [targetDate, setTargetDate] = useState("");
+  const [targetDate, setTargetDate] = useState(null);
   const [dailyCalories, setDailyCalories] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   
@@ -182,7 +187,7 @@ const CalorieTrackerPage = () => {
 
     const currentW = parseFloat(currentWeight);
     const targetW = parseFloat(targetWeight);
-    const targetD = new Date(targetDate);
+    const targetD = targetDate;
     const today = new Date();
     const timeDiff = targetD.getTime() - today.getTime();
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -307,11 +312,16 @@ const CalorieTrackerPage = () => {
             )}
 
             <Label>Target date:</Label>
-            <Input
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
+            <DatePickerWrapper>
+            <DatePicker
+                selected={targetDate}
+                onChange={(date) => setTargetDate(date)}
+                placeholderText="Select a date"
+                dateFormat="MM/dd/yyyy"
+                locale="en-US"
+                customInput={<StyledInput />}
             />
+            </DatePickerWrapper>
 
             <Label>Goal:</Label>
             <StyledSelect value={goal} onChange={(e) => setGoal(e.target.value)}>
@@ -499,3 +509,69 @@ const Error = styled.p`
   margin-bottom: 10px;
   font-weight: bold;
 `;
+
+const DatePickerWrapper = styled.div`
+  .react-datepicker-wrapper {
+    width: 96%;
+  }
+
+  .react-datepicker__input-container {
+    width: 96%;
+  }
+
+  .react-datepicker__input-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid ${({ theme }) => theme.text_secondary};
+    border-radius: 5px;
+    font-size: 14px;
+    color: ${({ theme }) => theme.text_primary};
+    background-color: ${({ theme }) => theme.bgLight};
+
+    &:focus {
+      outline: none;
+      border-color: ${({ theme }) => theme.primary};
+    }
+  }
+    .react-datepicker__current-month,
+  .react-datepicker__day-name,
+  .react-datepicker__day {
+    color: ${({ theme }) => theme.black};
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background-color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.black};
+  }
+
+  .react-datepicker__day:hover {
+    background-color: ${({ theme }) => theme.primary};
+  }
+
+  /* Remove the box-shadow */
+  .react-datepicker {
+    box-shadow: none;
+  }
+`;
+
+const StyledDatePicker = styled(DatePicker)`
+  .react-datepicker {
+    background-color: ${({ theme }) => theme.primary};
+    border: none;
+  }
+
+  .react-datepicker__header {
+    background-color: ${({ theme }) => theme.bgLight};
+    border-bottom: none;
+  }
+
+  
+`;
+
+// Custom Input Component for DatePicker
+const StyledInput = React.forwardRef(({ value, onClick }, ref) => (
+  <Input onClick={onClick} ref={ref} value={value} readOnly />
+));
+
