@@ -236,6 +236,10 @@ export const getUserDashboard = async (req, res, next) => {
   
       // Use today's date if no date is provided
       const workoutDate = date ? new Date(date) : new Date();
+
+      if (isNaN(workoutDate)) {
+        return next(createError(400, "Invalid date format"));
+      }
   
       console.log("Received Workout Data:", { date: workoutDate, category, exerciseName, sets, reps, weight, time });
   
@@ -291,52 +295,6 @@ export const getUserDashboard = async (req, res, next) => {
       next(err);
     }
   };
-  
-  
-
-const parseWorkoutString = (workoutString) => {
-  const workouts = workoutString.split(";").map((w) => w.trim()).filter(Boolean);
-  const parsedWorkouts = [];
-  let currentCategory = "";
-
-  workouts.forEach((workoutBlock) => {
-    const lines = workoutBlock.split("\n").map((line) => line.trim()).filter(Boolean);
-
-    if (lines[0].startsWith("#")) {
-      currentCategory = lines[0].substring(1).trim();
-      lines.shift();
-    }
-
-    const workoutDetails = parseWorkoutLines(lines);
-    if (workoutDetails) {
-      workoutDetails.category = currentCategory;
-      parsedWorkouts.push(workoutDetails);
-    }
-  });
-
-  return parsedWorkouts;
-};
-
-const parseWorkoutLines = (lines) => {
-  if (lines.length >= 4) {
-    const details = {};
-    details.workoutName = lines[0];
-    const setsRepsMatch = lines[1].match(/(\d+)\s*sets\s*X\s*(\d+)\s*reps/i);
-    if (setsRepsMatch) {
-      details.sets = parseInt(setsRepsMatch[1]);
-      details.reps = parseInt(setsRepsMatch[2]);
-    } else {
-      details.sets = 0;
-      details.reps = 0;
-    }
-    const weightMatch = lines[2].match(/(\d+\.?\d*)\s*kg/i);
-    details.weight = weightMatch ? parseFloat(weightMatch[1]) : 0;
-    const durationMatch = lines[3].match(/(\d+\.?\d*)\s*min/i);
-    details.duration = durationMatch ? parseFloat(durationMatch[1]) : 0;
-    return details;
-  }
-  return null;
-};
 
 const calculateCaloriesBurnt = (workoutDetails) => {
   const durationInMinutes = workoutDetails.duration || 0;

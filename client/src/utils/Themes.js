@@ -27,6 +27,7 @@ export const lightTheme = {
   red: "#FF5252",
   action_confirm_button: "#00ACC1",
   input: "#3c3c3c",
+  calendar_text: "#000000"
   };
   
   export const darkTheme = {
@@ -58,6 +59,7 @@ export const lightTheme = {
     chart_back: "#4A3C75",
     action_confirm_button: "#03DAC6",
     input: "#cdcdcd",
+    calendar_text: "#FFFFFF",
   
     // New additions for chart-specific text:
     chart_text: "#FFFFFF",         // White text for chart labels for good contrast on dark background

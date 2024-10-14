@@ -74,8 +74,8 @@ const Dashboard = () => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
 
-  // Separate state fields for each workout input
-  const [date, setDate] = useState("");
+  // Separated state fields for each workout input
+  const [date, setDate] = useState(null);
   const [category, setCategory] = useState("Back");
   const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState("");
@@ -128,9 +128,18 @@ const Dashboard = () => {
     setButtonLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
 
+    if (!date) {
+        alert("Please fill in all the fields.");
+        setButtonLoading(false);
+        return;
+      }
+    
+      // Convert date to ISO string
+      const formattedDate = date.toISOString();
+
     // Construct workout data from individual fields
     const workoutData = {
-      date,
+      date: formattedDate,
       category,
       exerciseName,
       sets,
