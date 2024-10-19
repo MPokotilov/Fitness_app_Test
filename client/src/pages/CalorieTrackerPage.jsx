@@ -262,7 +262,7 @@ const CalorieTrackerPage = () => {
       <Card>
         <ContentContainer>
           <Form onSubmit={calculateDailyCalories}>
-            <Title>Calorie Tracker</Title>
+            <Title>Calorie Calculator</Title>
             
             <Label>Gender:</Label>
             <StyledSelect value={gender} onChange={(e) => setGender(e.target.value)}>

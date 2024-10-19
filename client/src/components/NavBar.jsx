@@ -188,7 +188,8 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
           <Navlink to="/workouts">Workouts</Navlink>
           <Navlink to="/exercises">Exercises</Navlink>
           <Navlink to="/blogs">Blogs</Navlink>
-          <Navlink to="/calorie-tracker">Calorie calculator</Navlink>
+          <Navlink to="/calorie-calculator">Calorie calculator</Navlink>
+          
         </NavItems>
 
         <UserContainer>

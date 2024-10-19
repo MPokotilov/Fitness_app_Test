@@ -8,6 +8,7 @@ import Navbar from "./components/NavBar";
 import Dashboard from "./pages/Dashboard";
 import Workouts from "./pages/Workouts";
 import CalorieTrackerPage from "./pages/CalorieTrackerPage";
+import Exercises from "./pages/Exercises";
 
 const Container = styled.div`
   width: 100%;
@@ -42,7 +43,8 @@ function App() {
             <Routes>
               <Route path="/" exact element={<Dashboard />} />
               <Route path="/workouts" exact element={<Workouts />} />
-              <Route path="/calorie-tracker" exact element={<CalorieTrackerPage />} />
+              <Route path="/calorie-calculator" exact element={<CalorieTrackerPage />} />
+              <Route path="/exercises" exact element={<Exercises />} />
             </Routes>
           </Container>
         ) : (
