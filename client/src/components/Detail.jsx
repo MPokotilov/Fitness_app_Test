@@ -1,9 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
-import BodyPartImage from '../utils/Images/body-part.png';
-import TargetImage from '../utils/Images/target.png';
-import EquipmentImage from '../utils/Images/equipment.png';
+// Import SVG files instead of PNG
+import { ReactComponent as BodyPartIcon } from '../utils/Images/body-part.svg';
+import { ReactComponent as TargetIcon } from '../utils/Images/target.svg';
+import { ReactComponent as EquipmentIcon } from '../utils/Images/equipment.svg';
 
 const Container = styled.div`
   display: flex;
@@ -101,9 +102,10 @@ const DetailItem = styled.div`
       background-color: ${({ theme }) => theme.primaryLight};
     }
 
-    img {
+    svg {
       width: 40px;
       height: 40px;
+      fill: ${({ theme }) => theme.primary}; /* Apply the theme's primary color */
     }
   }
 
@@ -123,15 +125,15 @@ const Detail = ({ exerciseDetail }) => {
 
   const extraDetail = [
     {
-      icon: BodyPartImage,
+      icon: <BodyPartIcon />,
       name: bodyPart,
     },
     {
-      icon: TargetImage,
+      icon: <TargetIcon />,
       name: target,
     },
     {
-      icon: EquipmentImage,
+      icon: <EquipmentIcon />,
       name: equipment,
     },
   ];
@@ -151,7 +153,7 @@ const Detail = ({ exerciseDetail }) => {
           {extraDetail.map((item) => (
             <DetailItem key={item.name}>
               <div className="icon-button">
-                <img src={item.icon} alt={item.name} />
+                {item.icon}
               </div>
               <span>{item.name}</span>
             </DetailItem>
