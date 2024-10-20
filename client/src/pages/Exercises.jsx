@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { fetchData, exerciseOptions } from '../utils/exerciseApi';
 import Button from '../components/Button';
-import ExerciseCard from '../components/ExerciseCard';
+import ExerciseCard from '../components/cards/ExerciseCard';
 import debounce from 'lodash.debounce';
 
 const Container = styled.div`
