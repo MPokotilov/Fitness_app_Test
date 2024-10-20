@@ -244,7 +244,7 @@ const Exercises = () => {
 
   return (
     <Container>
-      <Title>Exercise Library</Title>
+      <Title>Exercises Library</Title>
 
       {/* Search Bar */}
       <SearchBarContainer>
