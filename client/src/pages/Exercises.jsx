@@ -246,7 +246,6 @@ const Exercises = () => {
     <Container>
       <Title>Exercises Library</Title>
 
-      {/* Search Bar */}
       <SearchBarContainer>
         <SearchBar>
           <Input
@@ -268,22 +267,17 @@ const Exercises = () => {
         </SearchBar>
       </SearchBarContainer>
 
-      {/* Exercises List */}
       <ExercisesWrapper>
-        {/* Display Error Message */}
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
-        {/* Display Loading Indicator */}
         {loading && <LoadingMessage>Loading exercises...</LoadingMessage>}
 
-        {/* List of Exercises */}
         <ExercisesContainer>
           {displayedExercises.map((exercise) => (
             <ExerciseCard key={exercise.id} exercise={exercise} />
           ))}
         </ExercisesContainer>
 
-        {/* Load More Button */}
         {!loading && hasMore && (
           <LoadMoreContainer>
             <Button text="Load More" onClick={loadMoreExercises} />
