@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Stack, Typography } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 
-// Styled components for customization
+
 const CardLink = styled(Link)`
   text-decoration: none;
   width: 300px;
@@ -34,7 +34,7 @@ const ExerciseInfo = styled.div`
 `;
 
 const ExerciseCard = ({ exercise }) => {
-  const theme = useTheme(); // Access the theme object
+  const theme = useTheme(); 
 
   return (
     <CardLink to={`/exercise/${exercise.id}`}>
@@ -44,8 +44,8 @@ const ExerciseCard = ({ exercise }) => {
           alt={exercise.name}
           loading="lazy"
           onError={(e) => {
-            e.target.onerror = null; // Prevent infinite loop
-            e.target.src = 'placeholder_image_url'; // Replace with your placeholder image URL or path
+            e.target.onerror = null; 
+            e.target.src = 'placeholder_image_url'; 
           }}
         />
       </ImageContainer>

@@ -25,10 +25,10 @@ const ErrorMessage = styled.p`
 `;
 
 const ExerciseDetail = () => {
-  const { id } = useParams(); // Get the exercise ID from the URL
+  const { id } = useParams();
   const [exerciseDetail, setExerciseDetail] = useState(null);
-  const [loading, setLoading] = useState(true); // State for loading
-  const [error, setError] = useState(null); // State for error handling
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchExerciseDetail = async () => {
