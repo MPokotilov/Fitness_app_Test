@@ -6,7 +6,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
-import { useDispatch } from "react-redux";
 import { deleteWorkout } from "../api";
 
 const Container = styled.div`
