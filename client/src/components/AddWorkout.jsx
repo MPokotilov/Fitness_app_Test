@@ -1,6 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "./Button";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+// Import the English locale
+import { registerLocale } from "react-datepicker";
+import enUS from "date-fns/locale/en-US";
 
 const Card = styled.div`
   flex: 1;
@@ -77,6 +83,53 @@ const Row = styled.div`
   gap: 10px;
 `;
 
+const DatePickerWrapper = styled.div`
+  .react-datepicker-wrapper {
+    width: 96%;
+  }
+
+  .react-datepicker__input-container {
+    width: 96%;
+  }
+
+  .react-datepicker__input-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid ${({ theme }) => theme.text_secondary};
+    border-radius: 5px;
+    font-size: 14px;
+    color: ${({ theme }) => theme.text_primary};
+    background-color: ${({ theme }) => theme.bgLight};
+
+    &:focus {
+      outline: none;
+      border-color: ${({ theme }) => theme.primary};
+    }
+  }
+    .react-datepicker__current-month,
+  .react-datepicker__day-name,
+  .react-datepicker__day {
+    color: ${({ theme }) => theme.black};
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background-color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.black};
+  }
+
+  .react-datepicker__day:hover {
+    background-color: ${({ theme }) => theme.primary};
+  }
+
+  /* Remove the box-shadow */
+  .react-datepicker {
+    box-shadow: none;
+  }
+`;
+
+
 const AddWorkout = ({
   date,
   setDate,
@@ -104,12 +157,15 @@ const AddWorkout = ({
       <Title>Add New Workout</Title>
 
       <Label>Date</Label>
-      <DateInput
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        placeholder="Select a date"
-      />
+      <DatePickerWrapper>
+        <DatePicker
+          selected={date}
+          onChange={(date) => setDate(date)}
+          placeholderText="Select a date"
+          dateFormat="MM.dd.yyyy"
+          locale="en-US" // Set the locale to English
+        />
+      </DatePickerWrapper>
 
       <Label>Category</Label>
       <Select
