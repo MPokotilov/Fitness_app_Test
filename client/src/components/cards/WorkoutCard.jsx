@@ -2,6 +2,7 @@ import { AccessTimeFilled } from "@mui/icons-material";
 import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
 import React from "react";
 import styled from "styled-components";
+import { useWeightUnit } from "../../context/WeightUnitContext"; // Import the context
 
 const Card = styled.div`
   flex: 1;
@@ -53,6 +54,8 @@ const Details = styled.div`
 `;
 
 const WorkoutCard = ({ workout }) => {
+  const { weightUnit, convertWeight } = useWeightUnit(); // Use weightUnit and convertWeight from context
+
   return (
     <Card>
       <Category>#{workout?.category}</Category>
@@ -62,8 +65,8 @@ const WorkoutCard = ({ workout }) => {
       </Sets>
       <Flex>
         <Details>
-        <FitnessIcon style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px white)' }} />
-          {workout?.weight} kg
+          <FitnessIcon style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px white)' }} />
+          {convertWeight(workout?.weight)} {weightUnit} {/* Convert weight and display unit */}
         </Details>
         <Details>
           <AccessTimeFilled sx={{ fontSize: "20px" }} />

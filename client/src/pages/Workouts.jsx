@@ -7,6 +7,7 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
 import { useDispatch } from "react-redux";
+import { useWeightUnit } from "../context/WeightUnitContext"; // Import the context
 
 const Container = styled.div`
   flex: 1;
@@ -76,6 +77,7 @@ const SecTitle = styled.div`
 
 const Workouts = () => {
   const dispatch = useDispatch();
+  const { weightUnit, convertWeight } = useWeightUnit(); // Use weightUnit and convertWeight
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
@@ -85,7 +87,6 @@ const Workouts = () => {
     const token = localStorage.getItem("fittrack-app-token");
     await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
       setTodaysWorkouts(res?.data?.todaysWorkouts);
-      console.log(res.data);
       setLoading(false);
     });
   };
@@ -93,6 +94,7 @@ const Workouts = () => {
   useEffect(() => {
     getTodaysWorkout();
   }, [date]);
+
   return (
     <Container>
       <Wrapper>
@@ -113,7 +115,14 @@ const Workouts = () => {
               <CardWrapper>
                 {todaysWorkouts.length > 0 ? (
                   todaysWorkouts.map((workout) => (
-                    <WorkoutCard key={workout._id} workout={workout} />
+                    <WorkoutCard
+                      key={workout._id}
+                      workout={{
+                        ...workout,
+                        weight: convertWeight(workout.weight), // Convert the weight
+                      }}
+                      weightUnit={weightUnit} // Pass the weight unit for display
+                    />
                   ))
                 ) : (
                   <p>No workouts logged for this date.</p>

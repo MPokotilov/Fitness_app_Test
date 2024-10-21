@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "./Button";
+import { useWeightUnit } from '../context/WeightUnitContext'; // Import the context
 
 const Card = styled.div`
   flex: 1;
@@ -87,8 +88,16 @@ const AddWorkout = ({
   addNewWorkout,
   buttonLoading
 }) => {
+  const { weightUnit } = useWeightUnit(); // Get weight unit from context
+
   const handleAddWorkout = () => {
     addNewWorkout();
+  };
+
+  const convertWeight = (weightValue) => {
+    return weightUnit === 'kg'
+      ? weightValue
+      : (weightValue * 2.20462).toFixed(2); // Convert to Lbs if needed
   };
 
   return (
@@ -146,12 +155,18 @@ const AddWorkout = ({
         </div>
       </Row>
 
-      <Label>Weight (kg)</Label>
+      <Label>Weight ({weightUnit === 'kg' ? 'Kg' : 'Lbs'})</Label>
       <Input
         type="number"
         value={weight}
-        onChange={(e) => setWeight(e.target.value)}
-        placeholder="Weight in kg"
+        onChange={(e) =>
+          setWeight(
+            weightUnit === 'kg'
+              ? e.target.value
+              : (e.target.value / 2.20462).toFixed(2) // Convert to Kg if needed
+          )
+        }
+        placeholder={`Weight in ${weightUnit === 'kg' ? 'Kg' : 'Lbs'}`}
       />
 
       <Label>Time (min)</Label>
