@@ -73,13 +73,17 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
           },
         },
       });
-
-      // Запускаем анимацию велосипедиста и полицейской машины после создания графика
-      animateCyclist();
     };
 
     initializeChart();
   }, [labels, data, theme]);
+
+  useEffect(() => {
+    // Запускаем анимацию только если флаг showCops активирован
+    if (showCops) {
+      animateCyclist();
+    }
+  }, [showCops]);
 
   const animateCyclist = () => {
     const datasetMeta = chartInstance.current.getDatasetMeta(0);
@@ -89,15 +93,14 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
       return;
     }
   
+    // Получаем координаты всех точек графика
     const positions = points.map((point) => ({
       x: point.getProps(['x'], true).x,
       y: point.getProps(['y'], true).y,
     }));
   
-    console.log('Animation positions:', positions); // Логируем позиции для отладки
-  
     let frame = 0;
-    const totalFrames = 200;
+    const totalFrames = 200; // Количество кадров для плавности анимации
   
     const animate = () => {
       if (frame >= totalFrames) return;
@@ -112,18 +115,18 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
       const currentPoint = positions[currentIndex];
       const nextPoint = positions[currentIndex + 1];
   
+      // Линейная интерполяция для вычисления текущей позиции между двумя точками графика
       const x = currentPoint.x + (nextPoint.x - currentPoint.x) * t;
       const y = currentPoint.y + (nextPoint.y - currentPoint.y) * t;
   
-      console.log(`Frame ${frame}: x=${x}, y=${y}`); // Логируем координаты для отладки
+      // Привязка положения велосипедиста точно к линии графика
+      cyclistRef.current.style.left = `${x - 25}px`;  // Центрируем велосипедиста по X
+      cyclistRef.current.style.top = `${y - 25}px`;   // Центрируем по Y
   
-      cyclistRef.current.style.left = `${x - 25}px`;
-      cyclistRef.current.style.top = `${y - 25}px`;
-  
-      if (copCarRef.current) {
-        copCarRef.current.style.left = `${x - 100}px`;
-        copCarRef.current.style.top = `${y - 90}px`;
-      }
+
+      copCarRef.current.style.left = `${x - 95}px`;
+      copCarRef.current.style.top = `${y - 35}px`;
+      
   
       frame++;
       requestAnimationFrame(animate);
@@ -131,6 +134,9 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
   
     animate();
   };
+  
+  
+  
   
 
   return (
@@ -153,7 +159,7 @@ const ChartWrapper = styled.div`
 
 const CyclistImage = styled.img`
   position: absolute;
-  width: 50px;
+  width: 60px;
   height: auto;
   left: 0;
   top: 0;
@@ -161,8 +167,8 @@ const CyclistImage = styled.img`
 
 const CopCarImage = styled.img`
   position: absolute;
-  width: 50px;
-  height: auto;
+  width: 70px;
+  height: 70px;
   left: 0;
   top: 0;
 `;

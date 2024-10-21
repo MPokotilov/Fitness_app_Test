@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import FormField from '../components/CalorieTracker/FormField';
 import WeightProgressChart from '../components/CalorieTracker/WeightProgressChart';
 import { useWeightUnit } from '../context/WeightUnitContext';
 
@@ -40,20 +39,18 @@ const CalorieTrackerPage = () => {
     event.preventDefault();
     setErrorMessage("");
   
-    // Проверка обязательных полей
     if (!currentWeight || !targetDate || !age || !height || !gender || !goal) {
       setErrorMessage("Please fill out all fields.");
       return;
     }
   
-    // Если цель не "maintenance", проверяем наличие целевого веса
     if (goal !== "maintenance" && !targetWeight) {
       setErrorMessage("Please fill out the target weight.");
       return;
     }
   
     const currentW = weightUnit === "lbs" ? parseFloat(currentWeight) / 2.20462 : parseFloat(currentWeight);
-    const targetW = goal !== "maintenance" ? (weightUnit === "lbs" ? parseFloat(targetWeight) / 2.20462 : parseFloat(targetWeight)) : currentW; // Если "maintenance", цель = текущий вес
+    const targetW = goal !== "maintenance" ? (weightUnit === "lbs" ? parseFloat(targetWeight) / 2.20462 : parseFloat(targetWeight)) : currentW;
     const targetD = new Date(targetDate);
     const today = new Date();
     const timeDiff = targetD.getTime() - today.getTime();
@@ -114,20 +111,39 @@ const CalorieTrackerPage = () => {
     }
   
     setDailyCalories(dailyCalories);
+
+    if (daysDiff <= 31) {
+      const newLabels = Array.from({ length: daysDiff + 1 }, (_, i) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        return date.toLocaleDateString('default', { day: 'numeric' });
+      });
+
+      const weightData = Array.from({ length: daysDiff + 1 }, (_, i) => {
+        return currentW + (weightDifference * (i / daysDiff));
+      });
+
+      setLabels(newLabels);
+      setData(weightData);
+    } else {
+      const newLabels = Array.from({ length: monthsDiff + 1 }, (_, i) => {
+        const date = new Date(today);
+        date.setMonth(today.getMonth() + i);
+        return date.toLocaleString('default', { month: 'short' });
+      });
   
-    const newLabels = Array.from({ length: monthsDiff + 1 }, (_, i) => {
-      const date = new Date(today);
-      date.setMonth(today.getMonth() + i);
-      return date.toLocaleString('default', { month: 'short' });
-    });
+      const weightData = Array.from({ length: monthsDiff + 1 }, (_, i) => {
+        return currentW + (weightDifference * (i / monthsDiff));
+      });
   
-    const weightData = Array.from({ length: monthsDiff + 1 }, (_, i) => {
-      return currentW + (weightDifference * (i / monthsDiff));
-    });
-  
-    setLabels(newLabels);
-    setData(weightData);
-    setShowCops(true);
+      setLabels(newLabels);
+      setData(weightData);
+    }
+
+    setShowCops(false); // Сначала убираем анимацию
+    setTimeout(() => {
+      setShowCops(true); // Затем снова запускаем
+    }, 0);
   };
 
   useEffect(() => {
@@ -145,19 +161,14 @@ const CalorieTrackerPage = () => {
           <Form onSubmit={calculateDailyCalories}>
             <Title>Calorie Tracker</Title>
 
-            <FormField
-              label="Gender:"
-              type="select"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              options={[
-                { label: "Male", value: "male" },
-                { label: "Female", value: "female" },
-              ]}
-            />
+            <Label>Gender:</Label>
+            <StyledSelect value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </StyledSelect>
 
-            <FormField
-              label="Age (Years):"
+            <Label>Age (Years):</Label>
+            <Input
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
@@ -166,8 +177,8 @@ const CalorieTrackerPage = () => {
               min="1"
             />
 
-            <FormField
-              label="Height (cm):"
+            <Label>Height (cm):</Label>
+            <Input
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
@@ -176,8 +187,8 @@ const CalorieTrackerPage = () => {
               min="1"
             />
 
-            <FormField
-              label={`Current weight (${weightUnit}):`}
+            <Label>Current weight ({weightUnit}):</Label>
+            <Input
               type="number"
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
@@ -187,48 +198,40 @@ const CalorieTrackerPage = () => {
             />
 
             {showTargetWeight && (
-              <FormField
-                label={`Target weight (${weightUnit}):`}
-                type="number"
-                value={targetWeight}
-                onChange={(e) => setTargetWeight(e.target.value)}
-                placeholder={`Enter target weight in ${weightUnit}`}
-              />
+              <>
+                <Label>Target weight ({weightUnit}):</Label>
+                <Input
+                  type="number"
+                  value={targetWeight}
+                  onChange={(e) => setTargetWeight(e.target.value)}
+                  placeholder={`Enter target weight in ${weightUnit}`}
+                />
+              </>
             )}
 
-            <FormField
-              label="Target date:"
+            <Label>Target date:</Label>
+            <Input
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
               min={today}
             />
 
-            <FormField
-              label="Goal:"
-              type="select"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-              options={[
-                { label: "Weight Loss", value: "weight_loss" },
-                { label: "Maintenance", value: "maintenance" }, // Для сохранения веса
-                { label: "Weight Gain", value: "weight_gain" },
-              ]}
-            />
+            <Label>Goal:</Label>
+            <StyledSelect value={goal} onChange={(e) => setGoal(e.target.value)}>
+              <option value="weight_loss">Weight Loss</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="weight_gain">Weight Gain</option>
+            </StyledSelect>
 
-            <FormField
-              label="Activity Level:"
-              type="select"
-              value={activityLevel}
-              onChange={(e) => setActivityLevel(parseFloat(e.target.value))}
-              options={[
-                { label: "Sedentary (little or no exercise)", value: "1.2" },
-                { label: "Lightly active (light exercise/sports 1-3 days/week)", value: "1.375" },
-                { label: "Moderately active (moderate exercise/sports 3-5 days/week)", value: "1.55" },
-                { label: "Very active (hard exercise/sports 6-7 days a week)", value: "1.725" },
-                { label: "Super active (very hard exercise/sports & a physical job)", value: "1.9" },
-              ]}
-            />
+            <Label>Activity Level:</Label>
+            <StyledSelect value={activityLevel} onChange={(e) => setActivityLevel(parseFloat(e.target.value))}>
+              <option value="1.2">Sedentary (little or no exercise)</option>
+              <option value="1.375">Lightly active (light exercise/sports 1-3 days/week)</option>
+              <option value="1.55">Moderately active (moderate exercise/sports 3-5 days/week)</option>
+              <option value="1.725">Very active (hard exercise/sports 6-7 days a week)</option>
+              <option value="1.9">Super active (very hard exercise/sports & a physical job)</option>
+            </StyledSelect>
 
             {errorMessage && <Error>{errorMessage}</Error>}
 
@@ -255,13 +258,11 @@ const CalorieTrackerPage = () => {
 
 export default CalorieTrackerPage;
 
-
 // Стили
 const Container = styled.div`
   padding: 20px;
-  max-width: 20div;
+  max-width: 1000px;
   margin: 0 auto;
-  overflow: scroll;
   background-color: ${({ theme }) => theme.bg};
 `;
 
@@ -273,15 +274,13 @@ const Card = styled.div`
   border-radius: 8px;
   background-color: ${({ theme }) => theme.card};
   box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
-  
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width:80%;
-  flex-wrap: wrap;
+  width: 100%;
 `;
 
 const Form = styled.form`
@@ -324,4 +323,43 @@ const Error = styled.p`
   margin-top: 5px;
   margin-bottom: 10px;
   font-weight: bold;
+`;
+
+const Label = styled.label`
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.text_primary};
+`;
+
+const Input = styled.input`
+  padding: 12px 15px;
+  width: 100%;
+  border: 1px solid #d1d3e2;
+  border-radius: 5px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.text_primary};
+  background-color: ${({ theme }) => theme.bgLight};
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.primary};
+    background-color: ${({ theme }) => theme.bgLight};
+  }
+`;
+
+const StyledSelect = styled.select`
+  padding: 12px 15px;
+  width: 100%;
+  border: 1px solid ${({ theme }) => theme.text_secondary};
+  border-radius: 5px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.text_primary};
+  background-color: ${({ theme }) => theme.card};
+  margin-bottom: 15px;
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.primary};
+    background-color: ${({ theme }) => theme.bgLight};
+  }
 `;
