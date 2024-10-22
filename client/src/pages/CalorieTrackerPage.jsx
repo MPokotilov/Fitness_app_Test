@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { useTheme } from "styled-components"; 
 import Chart from "chart.js/auto";
-import cyclistGif from './bicyclist.gif';
-import copCarGif from './car.gif';
+import cyclistGif from '../utils/Images/bicyclist.gif';
+import copCarGif from '../utils/Images/car.gif';
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
