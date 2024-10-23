@@ -134,8 +134,8 @@ const Dashboard = () => {
         return;
       }
     
-      // Convert date to ISO string
-      const formattedDate = date.toISOString();
+      const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      const formattedDate = adjustedDate.toISOString().split('T')[0];
 
     // Construct workout data from individual fields
     const workoutData = {
