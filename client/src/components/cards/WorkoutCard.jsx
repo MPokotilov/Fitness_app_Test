@@ -1,9 +1,8 @@
 import { AccessTimeFilled } from "@mui/icons-material";
 import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import ConfirmationModal from "./ConfirmationModal"; 
+import ConfirmationModal from "./ConfirmationModal";
 
 const Card = styled.div`
   flex: 1;
@@ -20,8 +19,14 @@ const Card = styled.div`
     padding: 12px 14px;
   }
 `;
+
+const FlexBetween = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 const Category = styled.div`
-  width: fit-content;
   font-size: 14px;
   color: ${({ theme }) => theme.primary};
   font-weight: 500;
@@ -29,11 +34,13 @@ const Category = styled.div`
   padding: 4px 10px;
   border-radius: 8px;
 `;
+
 const Name = styled.div`
   font-size: 20px;
   color: ${({ theme }) => theme.text_primary};
   font-weight: 600;
 `;
+
 const Sets = styled.div`
   font-size: 15px;
   color: ${({ theme }) => theme.text_secondary};
@@ -41,10 +48,12 @@ const Sets = styled.div`
   display: flex;
   gap: 6px;
 `;
+
 const Flex = styled.div`
   display: flex;
   gap: 16px;
 `;
+
 const Details = styled.div`
   font-size: 15px;
   color: ${({ theme }) => theme.text_primary};
@@ -55,37 +64,37 @@ const Details = styled.div`
 `;
 
 const DeleteButton = styled.button`
-  background: red;
-  color: ${({ theme }) => theme.primary};
   background: ${({ theme }) => theme.primary + 20};
+  color: ${({ theme }) => theme.primary};
   border: none;
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  align-self: flex-end;
 `;
 
 const WorkoutCard = ({ workout, onDelete }) => {
-    const [modalOpen, setModalOpen] = useState(false);
-  
-    const handleDeleteClick = () => {
-      setModalOpen(true);
-    };
-  
-    const handleConfirmDelete = () => {
-      setModalOpen(false);
-      onDelete(workout._id);
-    };
-  
-    const handleCancelDelete = () => {
-      setModalOpen(false);
-    };
-  
-    return (
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setModalOpen(false);
+    onDelete(workout._id);
+  };
+
+  const handleCancelDelete = () => {
+    setModalOpen(false);
+  };
+
+  return (
     <>
-        <Card>
-        <DeleteButton onClick={handleDeleteClick}>X</DeleteButton>
-        <Category>#{workout?.category}</Category>
+      <Card>
+        <FlexBetween>
+          <Category>#{workout?.category}</Category>
+          <DeleteButton onClick={handleDeleteClick}>X</DeleteButton>
+        </FlexBetween>
         <Name>{workout?.workoutName}</Name>
         <Sets>
           Count: {workout?.sets} sets X {workout?.reps} reps
@@ -115,5 +124,5 @@ const WorkoutCard = ({ workout, onDelete }) => {
     </>
   );
 };
-  
-  export default WorkoutCard;
+
+export default WorkoutCard;
