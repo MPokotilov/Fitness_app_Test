@@ -166,14 +166,9 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
         <NavItems>
           <Navlink to="/">Dashboard</Navlink>
           <Navlink to="/workouts">Workouts</Navlink>
-<<<<<<< HEAD
           <Navlink to="/exercises">Exercises</Navlink>
           <Navlink to="/calorie-calculator">Calorie calculator</Navlink>
           
-=======
-          <Navlink to="/tutorials">Tutorials</Navlink>
-          <Navlink to="/calorie-tracker">Calorie tracker</Navlink>
->>>>>>> TestsMockups
         </NavItems>
 
         <UserContainer>
