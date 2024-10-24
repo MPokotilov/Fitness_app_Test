@@ -7,6 +7,8 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
 import { deleteWorkout } from "../api";
+import { useDispatch } from "react-redux";
+import { useWeightUnit } from "../context/WeightUnitContext"; // Import the context
 
 const Container = styled.div`
   flex: 1;
@@ -75,6 +77,8 @@ const SecTitle = styled.div`
 `;
 
 const Workouts = () => {
+    const dispatch = useDispatch();
+    const { weightUnit, convertWeight } = useWeightUnit();
     const [todaysWorkouts, setTodaysWorkouts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState("");
@@ -127,8 +131,12 @@ const Workouts = () => {
                   todaysWorkouts.map((workout) => (
                     <WorkoutCard
                       key={workout._id}
-                      workout={workout}
-                      onDelete={handleDelete} // Pass the handleDelete function
+                      workout={{
+                        ...workout,
+                        weight: convertWeight(workout.weight), // Convert the weight
+                      }}
+                      weightUnit={weightUnit} // Pass the weight unit for display
+                      onDelete={handleDelete}
                     />
                   ))
                 ) : (

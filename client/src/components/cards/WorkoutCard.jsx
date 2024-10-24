@@ -3,6 +3,7 @@ import { ReactComponent as FitnessIcon } from "../../utils/dumbbell.svg";
 import React, { useState } from "react";
 import styled from "styled-components";
 import ConfirmationModal from "./ConfirmationModal";
+import { useWeightUnit } from "../../context/WeightUnitContext"; // Import the context
 
 const Card = styled.div`
   flex: 1;
@@ -71,8 +72,8 @@ const DeleteButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
-
-const WorkoutCard = ({ workout, onDelete }) => {
+const WorkoutCard = ({ workout }) => {
+  const { weightUnit, convertWeight } = useWeightUnit(); // Use weightUnit and convertWeight from context
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -87,40 +88,34 @@ const WorkoutCard = ({ workout, onDelete }) => {
   const handleCancelDelete = () => {
     setModalOpen(false);
   };
-
   return (
     <>
-      <Card>
+    <Card>
+      
         <FlexBetween>
           <Category>#{workout?.category}</Category>
           <DeleteButton onClick={handleDeleteClick}>X</DeleteButton>
         </FlexBetween>
-        <Name>{workout?.workoutName}</Name>
-        <Sets>
-          Count: {workout?.sets} sets X {workout?.reps} reps
-        </Sets>
-        <Flex>
-          <Details>
-            <FitnessIcon
-              style={{
-                width: "20px",
-                height: "20px",
-                filter: "drop-shadow(0 0 5px white)",
-              }}
-            />
-            {workout?.weight} kg
-          </Details>
-          <Details>
-            <AccessTimeFilled sx={{ fontSize: "20px" }} />
-            {workout?.duration} min
-          </Details>
-        </Flex>
-      </Card>
-      <ConfirmationModal
-        open={modalOpen}
-        onClose={handleCancelDelete}
-        onConfirm={handleConfirmDelete}
-      />
+      <Name>{workout?.workoutName}</Name>
+      <Sets>
+        Count: {workout?.sets} sets X {workout?.reps} reps
+      </Sets>
+      <Flex>
+        <Details>
+          <FitnessIcon style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px white)' }} />
+          {convertWeight(workout?.weight)} {weightUnit} {/* Convert weight and display unit */}
+        </Details>
+        <Details>
+          <AccessTimeFilled sx={{ fontSize: "20px" }} />
+          {workout?.duration} min
+        </Details>
+      </Flex>
+    </Card>
+    <ConfirmationModal
+          open={modalOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+        />
     </>
   );
 };
