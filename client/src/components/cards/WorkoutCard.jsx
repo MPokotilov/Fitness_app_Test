@@ -72,7 +72,7 @@ const DeleteButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
 `;
-const WorkoutCard = ({ workout }) => {
+const WorkoutCard = ({ workout, onDelete }) => {
   const { weightUnit, convertWeight } = useWeightUnit(); // Use weightUnit and convertWeight from context
   const [modalOpen, setModalOpen] = useState(false);
 
