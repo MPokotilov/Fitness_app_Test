@@ -11,8 +11,9 @@ export const updateUserEmail = async (userId, newEmail) =>
   API.patch(`/user/${userId}/email`, { email: newEmail });
 
 // Function to update user password
-export const updateUserPassword = async (userId, newPassword) =>
-  API.patch(`/user/${userId}/password`, { password: newPassword });
+export const updateUserPassword = async (userId, { currentPassword, password }) =>
+  API.patch(`/user/${userId}/password`, { currentPassword, password });
+
 
 export const UserSignUp = async (data) => API.post("/user/signup", data);
 export const UserSignIn = async (data) => API.post("/user/signin", data);
