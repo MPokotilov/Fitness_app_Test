@@ -5,29 +5,38 @@ import { logout } from "../redux/reducers/userSlice";
 import { useWeightUnit } from "../context/WeightUnitContext";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Avatar, IconButton } from "@mui/material";
-import { WbSunny, Nightlight, FitnessCenter } from "@mui/icons-material";
+import { WbSunny, Nightlight, FitnessCenter, Edit } from "@mui/icons-material";
+import EditModal from "./EditModal";  // Import the modal
 
 const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const { weightUnit, toggleWeightUnit } = useWeightUnit();
 
+  const [editModalOpen, setEditModalOpen] = useState(false); // State for Edit Modal
+  const [editType, setEditType] = useState(""); // To track whether editing email or password
+
   // Toggle dropdown visibility
   const handleDropdownToggle = () => {
     setIsOpen((prev) => !prev);
   };
 
+  // Open the modal for editing
+  const handleEditClick = (type) => {
+    setEditType(type);
+    setEditModalOpen(true);
+  };
+
   return (
     <DropdownContainer>
-      {/* Icon Button with Arrow Indicator */}
       <IconButton onClick={handleDropdownToggle} style={{ position: "relative" }}>
         <Avatar src={currentUser?.img}>{currentUser?.name[0]}</Avatar>
-        <ArrowDropDownIcon 
+        <ArrowDropDownIcon
           style={{
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.3s ease",
             marginLeft: "5px",
-            color: "#fff"
+            color: "#fff",
           }}
         />
       </IconButton>
@@ -36,9 +45,12 @@ const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
         <DropdownMenu>
           <UserInfo>
             <UserName>{currentUser?.name}</UserName>
-            <UserEmail>{currentUser?.email}</UserEmail>
+            <UserEmail>
+              {currentUser?.email}
+              <EditIcon onClick={() => handleEditClick("email")} />  {/* Button for email edit */}
+            </UserEmail>
           </UserInfo>
-          <MenuOption onClick={() => {}}>Change Password</MenuOption>
+          <MenuOption onClick={() => handleEditClick("password")}>Change Password</MenuOption>
           <ToggleContainer>
             <OptionToggleLabel>
               {isDarkMode ? (
@@ -64,6 +76,16 @@ const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
           <SignOutOption onClick={() => dispatch(logout())}>SIGN OUT</SignOutOption>
         </DropdownMenu>
       )}
+
+      {/* Modal for editing email/password */}
+      {editModalOpen && (
+        <EditModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          type={editType}
+          currentUser={currentUser}
+        />
+      )}
     </DropdownContainer>
   );
 };
@@ -73,7 +95,6 @@ export default SettingsDropdown;
 // Styled Components
 const DropdownContainer = styled.div`
   position: relative;
-  
 `;
 
 const DropdownMenu = styled.div`
@@ -104,6 +125,16 @@ const UserName = styled.div`
 const UserEmail = styled.div`
   font-size: 0.9em;
   color: ${({ theme }) => theme.text_secondary};
+  display: flex;
+  align-items: center;
+`;
+
+const EditIcon = styled(Edit)`
+  margin-left: 8px;
+  cursor: pointer;
+  &:hover {
+    color: ${({ theme }) => theme.primary};
+  }
 `;
 
 const MenuOption = styled.div`
@@ -121,7 +152,7 @@ const SignOutOption = styled(MenuOption)`
   text-align: center;
 `;
 
-// Toggle Switch Components
+// Toggle Components
 const ToggleContainer = styled.div`
   display: flex;
   justify-content: space-between;
