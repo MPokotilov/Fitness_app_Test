@@ -1,11 +1,11 @@
 import axios from "axios";
 
-// const API = axios.create({
-//   baseURL: process.env.REACT_APP_API_URL,
-// });
 const API = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: process.env.REACT_APP_API_URL,
 });
+// const API = axios.create({
+//   baseURL: "http://localhost:8080/api",
+// });
 // Function to update user email
 export const updateUserEmail = async (userId, newEmail) =>
   API.patch(`/user/${userId}/email`, { email: newEmail });
