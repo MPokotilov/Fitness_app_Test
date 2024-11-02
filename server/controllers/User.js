@@ -296,6 +296,99 @@ export const getUserDashboard = async (req, res, next) => {
     }
   };
 
+  export const updateUserEmail = async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const { email } = req.body;
+  
+      // Check if the user is authorized
+      if (userId !== req.user.id) {
+        return next(createError(403, "You are not authorized to update this user's email"));
+      }
+  
+      // Validate new email
+      if (!email) {
+        return next(createError(400, "Email is required"));
+      }
+  
+      // Check if the new email is already in use
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return next(createError(409, "Email is already in use"));
+      }
+  
+      // Update the email
+      await User.findByIdAndUpdate(userId, { email });
+      return res.status(200).json({ message: "Email updated successfully" });
+    } catch (error) {
+      return next(error);
+    }
+  };
+  
+  // Update User Password
+  export const updateUserPassword = async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const { currentPassword, password } = req.body;
+  
+      // Check if the user is authorized
+      if (userId !== req.user.id) {
+        return next(createError(403, "You are not authorized to update this user's password"));
+      }
+  
+      // Validate passwords
+      if (!currentPassword || !password) {
+        return next(createError(400, "Current and new passwords are required"));
+      }
+  
+      // Fetch user data
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(createError(404, "User not found"));
+      }
+  
+      // Verify current password
+      const isPasswordCorrect = bcrypt.compareSync(currentPassword, user.password);
+      if (!isPasswordCorrect) {
+        return next(createError(403, "Current password is incorrect"));
+      }
+  
+      // Hash the new password
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+  
+      // Update the password
+      await User.findByIdAndUpdate(userId, { password: hashedPassword });
+      return res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+      return next(error);
+    }
+  };
+  
+  // Update User Name
+  export const updateUserName = async (req, res, next) => {
+    try {
+      const userId = req.params.userId;
+      const { name } = req.body;
+  
+      // Check if the user is authorized
+      if (userId !== req.user.id) {
+        return next(createError(403, "You are not authorized to update this user's name"));
+      }
+  
+      // Validate new name
+      if (!name) {
+        return next(createError(400, "Name is required"));
+      }
+  
+      // Update the name
+      await User.findByIdAndUpdate(userId, { name });
+      return res.status(200).json({ message: "Name updated successfully" });
+    } catch (error) {
+      return next(error);
+    }
+  };
+
 const calculateCaloriesBurnt = (workoutDetails) => {
   const durationInMinutes = workoutDetails.duration || 0;
   const weightInKg = workoutDetails.weight || 0;
