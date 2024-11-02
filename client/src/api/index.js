@@ -4,6 +4,15 @@ const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
 });
 
+// Function to update user email
+export const updateUserEmail = async (userId, newEmail) =>
+  API.patch(`/user/${userId}/email`, { email: newEmail });
+
+// Function to update user password
+export const updateUserPassword = async (userId, { currentPassword, password }) =>
+  API.patch(`/user/${userId}/password`, { currentPassword, password });
+
+
 export const UserSignUp = async (data) => API.post("/user/signup", data);
 export const UserSignIn = async (data) => API.post("/user/signin", data);
 

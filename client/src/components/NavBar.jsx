@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import LogoImg from "../utils/Images/Logo.png";
 import { Link as LinkR, NavLink } from "react-router-dom";
@@ -6,6 +7,8 @@ import { MenuRounded } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducers/userSlice";
+import ProfileDropdown from './SettingsDropdown'; // Updated import path
+
 
 const Nav = styled.div`
   background-color: ${({ theme }) => theme.bg};
@@ -149,11 +152,10 @@ const ToggleButton = styled.input`
 
 const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
   const dispatch = useDispatch();
-  const [isOpen, setisOpen] = useState(false);
   return (
     <Nav>
       <NavContainer>
-        <Mobileicon onClick={() => setisOpen(!isOpen)}>
+        <Mobileicon>
           <MenuRounded sx={{ color: "inherit" }} />
         </Mobileicon>
         <NavLogo to="/">
@@ -170,17 +172,12 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
         </NavItems>
 
         <UserContainer>
-          <ThemeToggle>
-            <ToggleButton
-              type="checkbox"
-              onChange={toggleTheme}
-              checked={isDarkMode}
-            />
-            {isDarkMode ? "Dark Mode" : "Light Mode"}
-          </ThemeToggle>
-
-          <Avatar src={currentUser?.img}>{currentUser?.name[0]}</Avatar>
-          <TextButton onClick={() => dispatch(logout())}>Logout</TextButton>
+          {/* Use the ProfileDropdown component */}
+          <ProfileDropdown
+            currentUser={currentUser}
+            toggleTheme={toggleTheme}
+            isDarkMode={isDarkMode}
+          />
         </UserContainer>
       </NavContainer>
     </Nav>

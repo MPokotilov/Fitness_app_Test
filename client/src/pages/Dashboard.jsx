@@ -155,7 +155,7 @@ const Dashboard = () => {
         setButtonLoading(false);
       })
       .catch((err) => {
-        alert(err);
+        alert(err.response.data.message);
         setButtonLoading(false);
       });
   };

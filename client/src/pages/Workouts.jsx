@@ -7,6 +7,7 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
 import { deleteWorkout } from "../api";
+import { useWeightUnit } from "../context/WeightUnitContext";
 
 const Container = styled.div`
   flex: 1;
@@ -15,8 +16,8 @@ const Container = styled.div`
   justify-content: center;
   padding: 22px 0px;
   overflow-y: scroll;
-
 `;
+
 const Wrapper = styled.div`
   flex: 1;
   max-width: 1600px;
@@ -28,6 +29,7 @@ const Wrapper = styled.div`
     flex-direction: column;
   }
 `;
+
 const Left = styled.div`
   flex: 0.2;
   height: fit-content;
@@ -37,6 +39,7 @@ const Left = styled.div`
   box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
   background-color: ${({ theme }) => theme.chart_back};
 `;
+
 const Title = styled.div`
   font-weight: 600;
   font-size: 16px;
@@ -45,9 +48,11 @@ const Title = styled.div`
     font-size: 14px;
   }
 `;
+
 const Right = styled.div`
   flex: 1;
 `;
+
 const CardWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -58,6 +63,7 @@ const CardWrapper = styled.div`
     gap: 12px;
   }
 `;
+
 const Section = styled.div`
   display: flex;
   flex-direction: column;
@@ -68,6 +74,7 @@ const Section = styled.div`
     gap: 12px;
   }
 `;
+
 const SecTitle = styled.div`
   font-size: 22px;
   color: ${({ theme }) => theme.text_primary};
@@ -75,36 +82,41 @@ const SecTitle = styled.div`
 `;
 
 const Workouts = () => {
-    const [todaysWorkouts, setTodaysWorkouts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [date, setDate] = useState("");
-  
-    const getTodaysWorkout = async () => {
-      setLoading(true);
-      const token = localStorage.getItem("fittrack-app-token");
-      await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
-        setTodaysWorkouts(res?.data?.todaysWorkouts);
-        console.log(res.data);
-        setLoading(false);
-      });
-    };
-  
-    const handleDelete = async (workoutId) => {
-      const token = localStorage.getItem("fittrack-app-token");
-      try {
-        await deleteWorkout(token, workoutId);
-        setTodaysWorkouts((prevWorkouts) =>
-          prevWorkouts.filter((workout) => workout._id !== workoutId)
-        );
-      } catch (err) {
-        console.error("Error deleting workout:", err);
-        alert("Failed to delete workout");
-      }
-    };
-  
-    useEffect(() => {
-      getTodaysWorkout();
-    }, [date]);
+  const { weightUnit, convertWeight } = useWeightUnit();
+  const [todaysWorkouts, setTodaysWorkouts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState("");
+
+  const getTodaysWorkout = async () => {
+    setLoading(true);
+    const token = localStorage.getItem("fittrack-app-token");
+    await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
+      const convertedWorkouts = res?.data?.todaysWorkouts.map((workout) => ({
+        ...workout,
+        weight: convertWeight(workout.weight),
+      }));
+      setTodaysWorkouts(convertedWorkouts);
+      setLoading(false);
+    });
+  };
+
+  const handleDelete = async (workoutId) => {
+    const token = localStorage.getItem("fittrack-app-token");
+    try {
+      await deleteWorkout(token, workoutId);
+      setTodaysWorkouts((prevWorkouts) =>
+        prevWorkouts.filter((workout) => workout._id !== workoutId)
+      );
+    } catch (err) {
+      console.error("Error deleting workout:", err);
+      alert("Failed to delete workout");
+    }
+  };
+
+  useEffect(() => {
+    getTodaysWorkout();
+  }, [date]);
+
   return (
     <Container>
       <Wrapper>
@@ -128,7 +140,8 @@ const Workouts = () => {
                     <WorkoutCard
                       key={workout._id}
                       workout={workout}
-                      onDelete={handleDelete} // Pass the handleDelete function
+                      weightUnit={weightUnit} 
+                      onDelete={handleDelete}
                     />
                   ))
                 ) : (
