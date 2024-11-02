@@ -3,13 +3,27 @@ import styled from "styled-components";
 import { updateUserEmail, updateUserPassword } from "../api";  // API functions
 
 const EditModal = ({ open, onClose, type, currentUser }) => {
-  const [value, setValue] = useState("");
+  const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSave = async () => {
     if (type === "email") {
-      await updateUserEmail(currentUser._id, value);  // API call to update email
+      await updateUserEmail(currentUser._id, email); // API call to update email
     } else if (type === "password") {
-      await updateUserPassword(currentUser._id, value);  // API call to update password
+      
+      if (newPassword !== confirmPassword) {
+        alert("New passwords do not match.");
+        return;
+      }
+      if (!currentPassword || !newPassword) {
+        alert("Please fill in all password fields.");
+        return;
+      }
+
+      
+      await updateUserPassword(currentUser._id, { currentPassword, newPassword });
     }
     onClose();
   };
@@ -19,12 +33,35 @@ const EditModal = ({ open, onClose, type, currentUser }) => {
       <ModalContainer>
         <ModalHeader>Edit {type === "email" ? "Email" : "Password"}</ModalHeader>
         <ModalBody>
-          <Input
-            type={type === "email" ? "email" : "password"}
-            placeholder={`Enter new ${type}`}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
+          {type === "email" ? (
+            <Input
+              type="email"
+              placeholder="Enter new email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          ) : (
+            <>
+              <Input
+                type="password"
+                placeholder="Enter current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+              <Input
+                type="password"
+                placeholder="Re-enter new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </>
+          )}
         </ModalBody>
         <ModalFooter>
           <SaveButton onClick={handleSave}>Save</SaveButton>
@@ -74,13 +111,14 @@ const Input = styled.input`
   font-size: 16px;
   border-radius: 4px;
   border: 1px solid #ddd;
-`;
-const ModalFooter = styled.div`
-  display: flex;
-  justify-content: center; /* Центрирование кнопок */
-  gap: 10px;
+  margin-bottom: 10px;
 `;
 
+const ModalFooter = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+`;
 
 const SaveButton = styled.button`
   padding: 10px 20px;
@@ -92,7 +130,6 @@ const SaveButton = styled.button`
   &:hover {
     background: #45a049;
   }
-  right:500px;
 `;
 
 const ExitButton = styled.button`

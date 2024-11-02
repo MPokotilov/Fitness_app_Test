@@ -224,11 +224,7 @@ const AddWorkout = ({
         type="number"
         value={weight}
         onChange={(e) =>
-          setWeight(
-            weightUnit === 'kg'
-              ? e.target.value
-              : (e.target.value / 2.20462).toFixed(2) // Convert to Kg if needed
-          )
+          setWeight(e.target.value)
         }
         placeholder={`Weight in ${weightUnit === 'kg' ? 'Kg' : 'Lbs'}`}
       />
