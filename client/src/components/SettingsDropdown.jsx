@@ -1,20 +1,23 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/reducers/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, updateUserInfo } from "../redux/reducers/userSlice";
 import { useWeightUnit } from "../context/WeightUnitContext";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { Avatar, IconButton } from "@mui/material";
 import { WbSunny, Nightlight, FitnessCenter, Edit } from "@mui/icons-material";
-import EditModal from "./EditModal";  // Import the modal
+import EditModal from "./EditModal";
 
-const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
+const SettingsDropdown = ({ toggleTheme, isDarkMode }) => {
   const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
   const { weightUnit, toggleWeightUnit } = useWeightUnit();
 
-  const [editModalOpen, setEditModalOpen] = useState(false); // State for Edit Modal
-  const [editType, setEditType] = useState(""); // To track whether editing email or password
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editType, setEditType] = useState(""); // Track whether editing email, password, or name
+
+  const token = localStorage.getItem("fittrack-app-token");
 
   // Toggle dropdown visibility
   const handleDropdownToggle = () => {
@@ -27,10 +30,15 @@ const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
     setEditModalOpen(true);
   };
 
+  // Callback to update user info in Redux after successful change
+  const onUpdateUserInfo = (updatedInfo) => {
+    dispatch(updateUserInfo(updatedInfo));
+  };
+
   return (
     <DropdownContainer>
       <IconButton onClick={handleDropdownToggle} style={{ position: "relative" }}>
-        <Avatar src={currentUser?.img}>{currentUser?.name[0]}</Avatar>
+        <Avatar src={currentUser?.img}>{currentUser?.name ? currentUser.name[0] : "U"}</Avatar>
         <ArrowDropDownIcon
           style={{
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -44,10 +52,13 @@ const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
       {isOpen && (
         <DropdownMenu>
           <UserInfo>
-            <UserName>{currentUser?.name}</UserName>
+            <UserName>
+              {currentUser?.name}
+              <EditIcon onClick={() => handleEditClick("name")} /> {/* Button for name edit */}
+            </UserName>
             <UserEmail>
               {currentUser?.email}
-              <EditIcon onClick={() => handleEditClick("email")} />  {/* Button for email edit */}
+              <EditIcon onClick={() => handleEditClick("email")} /> {/* Button for email edit */}
             </UserEmail>
           </UserInfo>
           <MenuOption onClick={() => handleEditClick("password")}>Change Password</MenuOption>
@@ -73,17 +84,25 @@ const SettingsDropdown = ({ currentUser, toggleTheme, isDarkMode }) => {
               {weightUnit === "kg" ? "Lbs" : "Kg"}
             </WeightButton>
           </ToggleContainer>
-          <SignOutOption onClick={() => dispatch(logout())}>SIGN OUT</SignOutOption>
+          <SignOutOption
+            onClick={() => {
+              dispatch(logout());
+              localStorage.removeItem("fittrack-app-token"); // Clear token on logout
+            }}
+          >
+            SIGN OUT
+          </SignOutOption>
         </DropdownMenu>
       )}
 
-      {/* Modal for editing email/password */}
+      {/* Modal for editing email, password, or name */}
       {editModalOpen && (
         <EditModal
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
           type={editType}
-          currentUser={currentUser}
+          currentUser={{ ...currentUser, token }} // Pass currentUser with token
+          onUpdateUserInfo={onUpdateUserInfo} // Callback to update Redux state
         />
       )}
     </DropdownContainer>
@@ -120,6 +139,8 @@ const UserInfo = styled.div`
 const UserName = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.text_primary};
+  display: flex;
+  align-items: center;
 `;
 
 const UserEmail = styled.div`
@@ -152,7 +173,6 @@ const SignOutOption = styled(MenuOption)`
   text-align: center;
 `;
 
-// Toggle Components
 const ToggleContainer = styled.div`
   display: flex;
   justify-content: space-between;

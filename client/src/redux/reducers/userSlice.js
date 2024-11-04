@@ -14,11 +14,18 @@ export const userSlice = createSlice({
     },
     logout: (state) => {
       state.currentUser = null;
-      localStorage.removeItem("fitttrack-app-token");
+      localStorage.removeItem("fittrack-app-token");
+    },
+    updateUserInfo: (state, action) => {
+      if (state.currentUser) {
+        state.currentUser = {
+          ...state.currentUser,
+          ...action.payload,
+        };
+      }
     },
   },
 });
 
-export const { loginSuccess, logout } = userSlice.actions;
-
+export const { loginSuccess, logout, updateUserInfo } = userSlice.actions;
 export default userSlice.reducer;

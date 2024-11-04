@@ -1,45 +1,93 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { updateUserEmail, updateUserPassword } from "../api";  // API functions
+import { updateUserEmail, updateUserPassword, updateUserName } from "../api"; // Import API functions
 
-const EditModal = ({ open, onClose, type, currentUser }) => {
+const EditModal = ({ open, onClose, type, currentUser, onUpdateUserInfo }) => {
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
+  const [name, setName] = useState("");
+  const [confirmName, setConfirmName] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSave = async () => {
-    if (type === "email") {
-      await updateUserEmail(currentUser._id, email); // API call to update email
-    } else if (type === "password") {
-      
-      if (newPassword !== confirmPassword) {
-        alert("New passwords do not match.");
-        return;
-      }
-      if (!currentPassword || !newPassword) {
-        alert("Please fill in all password fields.");
-        return;
-      }
-
-      
-      await updateUserPassword(currentUser._id, { currentPassword, newPassword });
+    const token = currentUser?.token;
+    if (!token) {
+      setErrorMessage("Authorization token is missing. Please log in again.");
+      return;
     }
-    onClose();
+
+    try {
+      if (type === "email") {
+        if (email !== confirmEmail) {
+          setErrorMessage("Emails do not match.");
+          return;
+        }
+        await updateUserEmail(currentUser._id, email, token);
+        onUpdateUserInfo({ email });
+      } else if (type === "name") {
+        if (name !== confirmName) {
+          setErrorMessage("Names do not match.");
+          return;
+        }
+        await updateUserName(currentUser._id, name, token);
+        onUpdateUserInfo({ name });
+      } else if (type === "password") {
+        if (newPassword !== confirmPassword) {
+          setErrorMessage("Passwords do not match.");
+          return;
+        }
+        if (!currentPassword || !newPassword) {
+          setErrorMessage("Please fill in all password fields.");
+          return;
+        }
+        await updateUserPassword(currentUser._id, { currentPassword, password: newPassword }, token);
+      }
+      onClose();
+    } catch (error) {
+      setErrorMessage("Failed to update. Please try again.");
+      console.error("Update failed:", error);
+    }
   };
 
   return (
     <ModalBackdrop open={open}>
       <ModalContainer>
-        <ModalHeader>Edit {type === "email" ? "Email" : "Password"}</ModalHeader>
+        <ModalHeader>Edit {type === "email" ? "Email" : type === "name" ? "Name" : "Password"}</ModalHeader>
         <ModalBody>
+          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
           {type === "email" ? (
-            <Input
-              type="email"
-              placeholder="Enter new email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <>
+              <Input
+                type="email"
+                placeholder="Enter new email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                type="email"
+                placeholder="Confirm new email"
+                value={confirmEmail}
+                onChange={(e) => setConfirmEmail(e.target.value)}
+              />
+            </>
+          ) : type === "name" ? (
+            <>
+              <Input
+                type="text"
+                placeholder="Enter new name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                type="text"
+                placeholder="Confirm new name"
+                value={confirmName}
+                onChange={(e) => setConfirmName(e.target.value)}
+              />
+            </>
           ) : (
             <>
               <Input
@@ -75,6 +123,12 @@ const EditModal = ({ open, onClose, type, currentUser }) => {
 export default EditModal;
 
 // Styled Components
+const ErrorText = styled.p`
+  color: red;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
 const ModalBackdrop = styled.div`
   display: ${({ open }) => (open ? "block" : "none")};
   position: fixed;
