@@ -259,7 +259,6 @@ export const getUserDashboard = async (req, res, next) => {
         return next(createError(400, "Time is required"));
       }
   
-      // Construct workout data object with updated calorie calculation
       const workoutData = {
         user: userId,
         date: workoutDate,
