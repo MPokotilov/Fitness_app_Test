@@ -228,20 +228,15 @@ export const getUserDashboard = async (req, res, next) => {
   };
   
 
-
   export const addWorkout = async (req, res, next) => {
     try {
       const userId = req.user?.id;
       const { date, category, exerciseName, sets, reps, weight, time } = req.body;
   
-      // Use today's date if no date is provided
       const workoutDate = date ? new Date(date) : new Date();
-
       if (isNaN(workoutDate)) {
         return next(createError(400, "Invalid date format"));
       }
-  
-      console.log("Received Workout Data:", { date: workoutDate, category, exerciseName, sets, reps, weight, time });
   
       // Validation for required fields
       if (!category) {
@@ -263,7 +258,6 @@ export const getUserDashboard = async (req, res, next) => {
         return next(createError(400, "Time is required"));
       }
   
-      // Construct workout data object
       const workoutData = {
         user: userId,
         date: workoutDate,
@@ -273,10 +267,14 @@ export const getUserDashboard = async (req, res, next) => {
         reps: parseInt(reps),
         weight: parseFloat(weight),
         duration: parseFloat(time),
-        caloriesBurned: calculateCaloriesBurnt({ weight: parseFloat(weight), duration: parseFloat(time) }),
+        caloriesBurned: calculateCaloriesBurnt({
+          sets: parseInt(sets),
+          reps: parseInt(reps),
+          weight: parseFloat(weight),
+          time: parseFloat(time),
+        }),
       };
   
-      // Insert or update workout
       await Workout.updateOne(
         {
           user: userId,
@@ -389,9 +387,15 @@ export const getUserDashboard = async (req, res, next) => {
     }
   };
 
-const calculateCaloriesBurnt = (workoutDetails) => {
-  const durationInMinutes = workoutDetails.duration || 0;
-  const weightInKg = workoutDetails.weight || 0;
-  const caloriesBurntPerMinute = 0.7;
-  return durationInMinutes * caloriesBurntPerMinute * weightInKg;
+  const calculateCaloriesBurnt = ({ sets, reps, weight, time }) => {
+    const loadCoefficient = 0.05;      
+    const timeCoefficient = 3;        
+    const intensityCoefficient = 1.2; 
+    
+    const caloriesFromLoad = weight * sets * reps * loadCoefficient;
+    
+    const adjustedTime = time * (1 + (reps / 20)); 
+    const caloriesFromTime = adjustedTime * timeCoefficient * intensityCoefficient;
+
+    return Math.round(caloriesFromLoad + caloriesFromTime);
 };

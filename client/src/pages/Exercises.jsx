@@ -19,32 +19,42 @@ const Title = styled.h2`
 const SearchBarContainer = styled.div`
   position: sticky;
   top: 0;
-  background-color: ${({ theme }) => theme.bg};
+  background-color: transparent;
   padding: 10px 0;
   z-index: 10;
   width: 50%;
   margin: 0 auto;
 `;
 
-
 const SearchBar = styled.div`
   display: flex;
   justify-content: center;
-  gap: 10px;
+  align-items: stretch; /* Stretch items to fill the container's height */
   position: relative;
 `;
 
+const InputContainer = styled.div`
+  position: relative;
+  margin-right: 10px; /* Space between input and button */
+  width: 50%; /* Desired width of the input field */
+  height: 55px; /* Set the same height as the button */
+  
+`;
+
 const Input = styled.input`
-  padding: 10px;
-  width: 50%;
+  padding: 0 10px;
+  width: 100%;
+  height: 100%; /* Fill the InputContainer's height */
   border: 1px solid ${({ theme }) => theme.text_primary};
   border-radius: 5px;
   background-color: ${({ theme }) => theme.bgLight};
   color: ${({ theme }) => theme.text_primary};
+  font-size: 16px;
+  box-sizing: border-box; /* Include padding and border in height */
 `;
 
 const SuggestionsList = styled.ul`
-  width: 50%;
+  width: 100%;
   max-height: 200px;
   margin-top: 0;
   padding: 0;
@@ -55,6 +65,7 @@ const SuggestionsList = styled.ul`
   overflow-y: auto;
   position: absolute;
   top: 100%; /* Position below the input field */
+  left: 0;
   z-index: 1000;
 `;
 
@@ -109,7 +120,7 @@ const Exercises = () => {
   const limit = 20;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hasMore, setHasMore] = useState(true); // New state variable
+  const [hasMore, setHasMore] = useState(true);
 
   // State for suggestions
   const [suggestions, setSuggestions] = useState([]);
@@ -248,21 +259,26 @@ const Exercises = () => {
 
       <SearchBarContainer>
         <SearchBar>
-          <Input
-            type="text"
-            placeholder="Search exercises..."
-            value={searchTerm}
-            onChange={handleInputChange}
-          />
-          {suggestions.length > 0 && (
-            <SuggestionsList>
-              {suggestions.map((suggestion, index) => (
-                <SuggestionItem key={index} onClick={() => handleSuggestionClick(suggestion)}>
-                  {suggestion}
-                </SuggestionItem>
-              ))}
-            </SuggestionsList>
-          )}
+          <InputContainer>
+            <Input
+              type="text"
+              placeholder="Search exercises..."
+              value={searchTerm}
+              onChange={handleInputChange}
+            />
+            {suggestions.length > 0 && (
+              <SuggestionsList>
+                {suggestions.map((suggestion, index) => (
+                  <SuggestionItem
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion}
+                  </SuggestionItem>
+                ))}
+              </SuggestionsList>
+            )}
+          </InputContainer>
           <Button text="Search" onClick={() => handleSearch()} />
         </SearchBar>
       </SearchBarContainer>
@@ -283,7 +299,6 @@ const Exercises = () => {
             <Button text="Load More" onClick={loadMoreExercises} />
           </LoadMoreContainer>
         )}
-
       </ExercisesWrapper>
     </Container>
   );
