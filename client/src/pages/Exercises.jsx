@@ -19,7 +19,7 @@ const Title = styled.h2`
 const SearchBarContainer = styled.div`
   position: sticky;
   top: 0;
-  background-color: ${({ theme }) => theme.bg};
+  background-color: transparent;
   padding: 10px 0;
   z-index: 10;
   width: 50%;
