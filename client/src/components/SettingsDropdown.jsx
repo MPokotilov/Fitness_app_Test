@@ -40,13 +40,16 @@ const SettingsDropdown = ({ toggleTheme, isDarkMode }) => {
       <IconButton onClick={handleDropdownToggle} style={{ position: "relative" }}>
         <Avatar src={currentUser?.img}>{currentUser?.name ? currentUser.name[0] : "U"}</Avatar>
         <ArrowDropDownIcon
-          style={{
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-            transition: "transform 0.3s ease",
-            marginLeft: "5px",
-            color: "#fff",
-          }}
-        />
+  style={{
+    transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+    transition: "transform 0.3s ease",
+    marginLeft: "5px",
+    color: isDarkMode ? "#A078F2" : "#2ED6CF", // Dark: purple, Light: teal
+    borderRadius: "50%",
+    padding: "2px",
+  }}
+/>
+
       </IconButton>
 
       {isOpen && (

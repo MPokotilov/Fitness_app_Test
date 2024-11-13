@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import WeightProgressChart from '../components/CalorieTracker/WeightProgressChart';
 import { useWeightUnit } from '../context/WeightUnitContext';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const CalorieTrackerPage = () => {
   const [currentWeight, setCurrentWeight] = useState("");
@@ -38,29 +41,29 @@ const CalorieTrackerPage = () => {
   const calculateDailyCalories = (event) => {
     event.preventDefault();
     setErrorMessage("");
-  
+
     if (!currentWeight || !targetDate || !age || !height || !gender || !goal) {
       setErrorMessage("Please fill out all fields.");
       return;
     }
-  
+
     if (goal !== "maintenance" && !targetWeight) {
       setErrorMessage("Please fill out the target weight.");
       return;
     }
-  
+
     const currentW = weightUnit === "lbs" ? parseFloat(currentWeight) / 2.20462 : parseFloat(currentWeight);
     const targetW = goal !== "maintenance" ? (weightUnit === "lbs" ? parseFloat(targetWeight) / 2.20462 : parseFloat(targetWeight)) : currentW;
     const targetD = new Date(targetDate);
     const today = new Date();
     const timeDiff = targetD.getTime() - today.getTime();
     const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  
+
     if (daysDiff <= 0) {
       setErrorMessage("Please select a future date.");
       return;
     }
-  
+
     if (goal === "weight_loss" && targetW >= currentW) {
       setErrorMessage("Target weight must be less than current weight for weight loss.");
       return;
@@ -68,48 +71,48 @@ const CalorieTrackerPage = () => {
       setErrorMessage("Target weight must be greater than current weight for weight gain.");
       return;
     }
-  
+
     const ageNum = parseInt(age);
     const heightNum = parseInt(height);
-  
+
     let BMR;
     if (gender === "male") {
       BMR = (10 * currentW) + (6.25 * heightNum) - (5 * ageNum) + 5;
     } else {
       BMR = (10 * currentW) + (6.25 * heightNum) - (5 * ageNum) - 161;
     }
-  
+
     const adjustedBMR = BMR * activityLevel;
     let dailyCalories;
     const weightDifference = targetW - currentW;
     const monthsDiff = targetD.getMonth() - today.getMonth() + (12 * (targetD.getFullYear() - today.getFullYear()));
-  
+
     if (goal === "weight_loss") {
       const maxDeficit = adjustedBMR * 0.3;
       const totalCaloriesToBurn = (currentW - targetW) * 7700;
       const dailyCalorieDeficit = totalCaloriesToBurn / daysDiff;
-  
+
       if (dailyCalorieDeficit > maxDeficit) {
         setErrorMessage("The selected period is too short for healthy weight loss. Please choose a longer period.");
         return;
       }
-  
+
       dailyCalories = adjustedBMR - dailyCalorieDeficit;
     } else if (goal === "weight_gain") {
       const maxSurplus = adjustedBMR * 0.3;
       const totalCaloriesToGain = (targetW - currentW) * 7700;
       const dailyCalorieSurplus = totalCaloriesToGain / daysDiff;
-  
+
       if (dailyCalorieSurplus > maxSurplus) {
         setErrorMessage("The selected period is too short for healthy weight gain. Please choose a longer period.");
         return;
       }
-  
+
       dailyCalories = adjustedBMR + dailyCalorieSurplus;
     } else {
       dailyCalories = adjustedBMR; // Для "maintenance" — просто BMR
     }
-  
+
     setDailyCalories(dailyCalories);
 
     if (daysDiff <= 31) {
@@ -131,11 +134,11 @@ const CalorieTrackerPage = () => {
         date.setMonth(today.getMonth() + i);
         return date.toLocaleString('default', { month: 'short' });
       });
-  
+
       const weightData = Array.from({ length: monthsDiff + 1 }, (_, i) => {
         return currentW + (weightDifference * (i / monthsDiff));
       });
-  
+
       setLabels(newLabels);
       setData(weightData);
     }
@@ -208,15 +211,22 @@ const CalorieTrackerPage = () => {
                 />
               </>
             )}
-
             <Label>Target date:</Label>
-            <Input
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-              min={today}
-            />
-            
+            <DatePickerWrapper>
+              <DatePicker
+                selected={targetDate ? new Date(targetDate) : null}
+                onChange={(date) => setTargetDate(date.toISOString().split("T")[0])}
+                minDate={new Date()} // Prevent past dates
+                dateFormat="yyyy-MM-dd" // Ensure consistent format
+                placeholderText="Select a target date"
+                className="custom-datepicker" // Apply consistent styles
+                wrapperClassName="custom-datepicker-wrapper" // Wrapper styles
+              />
+            </DatePickerWrapper>
+
+
+
+
 
             <Label>Goal:</Label>
             <StyledSelect value={goal} onChange={(e) => setGoal(e.target.value)}>
@@ -363,5 +373,48 @@ const StyledSelect = styled.select`
     outline: none;
     border-color: ${({ theme }) => theme.primary};
     background-color: ${({ theme }) => theme.bgLight};
+  }
+`;
+
+const DatePickerWrapper = styled.div`
+  .react-datepicker-wrapper {
+    display: flex; /* Ensure alignment with other inputs */
+    width: 100%; /* Match the width of other inputs */
+  }
+
+  .react-datepicker__input-container {
+    width: 100%; /* Ensure full width for the input */
+  }
+
+  .react-datepicker__input-container input {
+    width: 100%; /* Make input take full width */
+    padding: 12px 15px; /* Match padding of other inputs */
+    margin-bottom: 15px; /* Match spacing of other inputs */
+    border: 1px solid ${({ theme }) => theme.text_secondary};
+    border-radius: 5px;
+    font-size: 14px;
+    color: ${({ theme }) => theme.text_primary};
+    background-color: ${({ theme }) => theme.bgLight};
+    box-sizing: border-box; /* Ensure consistent box model */
+
+    &:focus {
+      outline: none;
+      border-color: ${({ theme }) => theme.primary};
+      background-color: ${({ theme }) => theme.bgLight};
+    }
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background-color: ${({ theme }) => theme.primary};
+    color: #fff;
+  }
+
+  .react-datepicker__day:hover {
+    background-color: ${({ theme }) => theme.secondary};
+  }
+
+  .react-datepicker {
+    box-shadow: none; /* Remove default box shadow */
   }
 `;
