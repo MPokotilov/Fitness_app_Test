@@ -3,10 +3,6 @@ import styled from "styled-components";
 import Button from "./Button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-
-import { registerLocale } from "react-datepicker";
-import enUS from "date-fns/locale/en-US";
 import { useWeightUnit } from '../context/WeightUnitContext';
 
 const Card = styled.div`
