@@ -4,10 +4,10 @@ import Button from "./Button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-// Import the English locale
+
 import { registerLocale } from "react-datepicker";
 import enUS from "date-fns/locale/en-US";
-import { useWeightUnit } from '../context/WeightUnitContext'; // Import the context
+import { useWeightUnit } from '../context/WeightUnitContext';
 
 const Card = styled.div`
   flex: 1;
@@ -164,7 +164,7 @@ const AddWorkout = ({
   addNewWorkout,
   buttonLoading
 }) => {
-  const { weightUnit } = useWeightUnit(); // Get weight unit from context
+  const { weightUnit } = useWeightUnit(); 
 
   const handleAddWorkout = () => {
     addNewWorkout();
@@ -173,7 +173,7 @@ const AddWorkout = ({
   const convertWeight = (weightValue) => {
     return weightUnit === 'kg'
       ? weightValue
-      : (weightValue * 2.20462).toFixed(2); // Convert to Lbs if needed
+      : (weightValue * 2.20462).toFixed(2);
   };
 
   return (
@@ -188,7 +188,7 @@ const AddWorkout = ({
           minDate={new Date()}
           placeholderText="Select a date"
           dateFormat="MM.dd.yyyy"
-          locale="en-US" // Set the locale to English
+          locale="en-US"
         />
       </DatePickerWrapper>
 

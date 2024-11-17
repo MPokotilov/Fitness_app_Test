@@ -131,14 +131,14 @@ const Workouts = () => {
     onChange={(e) => setDate(`${e.$M + 1}/${e.$D}/${e.$y}`)}
     sx={{
         "& .MuiPickersDay-root": {
-          borderRadius: "50%", // Ensure consistent styling
+          borderRadius: "50%",
         },
         "& .Mui-selected": {
-          backgroundColor: `${theme.primary} !important`, // Use theme's primary color
-          color: "white !important", // Use white text for contrast
+          backgroundColor: `${theme.primary} !important`,
+          color: "white !important", 
         },
         "& .Mui-selected:hover": {
-          backgroundColor: `${theme.primaryLight} !important`, // Use theme's lighter primary color on hover
+          backgroundColor: `${theme.primaryLight} !important`,
         },
       }}
   />

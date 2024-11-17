@@ -110,7 +110,7 @@ const CalorieTrackerPage = () => {
 
       dailyCalories = adjustedBMR + dailyCalorieSurplus;
     } else {
-      dailyCalories = adjustedBMR; // Для "maintenance" — просто BMR
+      dailyCalories = adjustedBMR;
     }
 
     setDailyCalories(dailyCalories);
@@ -143,17 +143,17 @@ const CalorieTrackerPage = () => {
       setData(weightData);
     }
 
-    setShowCops(false); // Сначала убираем анимацию
+    setShowCops(false);
     setTimeout(() => {
-      setShowCops(true); // Затем снова запускаем
+      setShowCops(true);
     }, 0);
   };
 
   useEffect(() => {
     if (goal === "maintenance") {
-      setShowTargetWeight(false); // Скрыть поле
+      setShowTargetWeight(false);
     } else {
-      setShowTargetWeight(true); // Показать поле
+      setShowTargetWeight(true);
     }
   }, [goal]);
 
@@ -268,7 +268,7 @@ const CalorieTrackerPage = () => {
 
 export default CalorieTrackerPage;
 
-// Стили
+
 const Container = styled.div`
   padding: 20px;
   max-width: 1000px;
