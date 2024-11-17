@@ -216,11 +216,10 @@ const CalorieTrackerPage = () => {
               <DatePicker
                 selected={targetDate ? new Date(targetDate) : null}
                 onChange={(date) => setTargetDate(date.toISOString().split("T")[0])}
-                minDate={new Date()} // Prevent past dates
-                dateFormat="yyyy-MM-dd" // Ensure consistent format
+                minDate={new Date()}
+                dateFormat="yyyy-MM-dd"
                 placeholderText="Select a target date"
-                className="custom-datepicker" // Apply consistent styles
-                wrapperClassName="custom-datepicker-wrapper" // Wrapper styles
+                
               />
             </DatePickerWrapper>
 
@@ -258,7 +257,7 @@ const CalorieTrackerPage = () => {
             data={data}
             theme={{ primary: "#4e73df", bgLight: "#f8f9fc", text_primary: "#858796" }}
             goal={goal}
-            currentWeight={currentWeight} // Передаем currentWeight
+            currentWeight={currentWeight}
             showCops={showCops}
           />
         </ContentContainer>
@@ -408,13 +407,33 @@ const DatePickerWrapper = styled.div`
   .react-datepicker__day--keyboard-selected {
     background-color: ${({ theme }) => theme.primary};
     color: #fff;
+
   }
 
   .react-datepicker__day:hover {
-    background-color: ${({ theme }) => theme.secondary};
+    background-color: ${({ theme }) => theme.primary};
+    
+  }
+
+  .react-datepicker__day,
+  .react-datepicker__day-name,
+  .react-datepicker__current-month {
+    color: ${({ theme }) => theme.text_secondary};
+  }
+
+  .react-datepicker__day--disabled {
+    color: ${({ theme }) => theme.text_secondary};
+    opacity: 0.4; /* Make disabled/past dates transparent */
+    cursor: not-allowed; /* Indicate disabled state */
+  }
+
+  .react-datepicker__header {
+    background-color: ${({ theme }) => theme.bgLight};
   }
 
   .react-datepicker {
     box-shadow: none; /* Remove default box shadow */
+    background-color: ${({ theme }) => theme.bgLight};
   }
 `;
+
