@@ -150,14 +150,12 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
 
 export default WeightProgressChart;
 
+// Стили
 const ChartWrapper = styled.div`
   position: relative;
-  width: 60%; /* Match this with Card for uniformity */
-  height: 800px; /* Adjust height as needed */
-  margin-top: 50px; /* Move the graph lower if needed */
+  width: 60%;
+  height: 800px;
 `;
-
-
 
 const CyclistImage = styled.img`
   position: absolute;
