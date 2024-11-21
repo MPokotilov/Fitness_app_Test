@@ -3,11 +3,7 @@ import styled from "styled-components";
 import Button from "./Button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-// Import the English locale
-import { registerLocale } from "react-datepicker";
-import enUS from "date-fns/locale/en-US";
-import { useWeightUnit } from '../context/WeightUnitContext'; // Import the context
+import { useWeightUnit } from '../context/WeightUnitContext';
 
 const Card = styled.div`
   flex: 1;
@@ -86,49 +82,64 @@ const Row = styled.div`
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
-    width: 96%;
+    display: flex; /* Ensure alignment with other inputs */
+    width: 100%; /* Match the width of other inputs */
   }
 
   .react-datepicker__input-container {
-    width: 96%;
+    width: 100%; /* Ensure full width for the input */
   }
 
   .react-datepicker__input-container input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
+    width: 100%; /* Make input take full width */
+    padding: 12px 15px; /* Match padding of other inputs */
+    margin-bottom: 15px; /* Match spacing of other inputs */
     border: 1px solid ${({ theme }) => theme.text_secondary};
     border-radius: 5px;
     font-size: 14px;
     color: ${({ theme }) => theme.text_primary};
     background-color: ${({ theme }) => theme.bgLight};
+    box-sizing: border-box; /* Ensure consistent box model */
 
     &:focus {
       outline: none;
       border-color: ${({ theme }) => theme.primary};
+      background-color: ${({ theme }) => theme.bgLight};
     }
-  }
-    .react-datepicker__current-month,
-  .react-datepicker__day-name,
-  .react-datepicker__day {
-    color: ${({ theme }) => theme.black};
   }
 
   .react-datepicker__day--selected,
   .react-datepicker__day--keyboard-selected {
     background-color: ${({ theme }) => theme.primary};
-    color: ${({ theme }) => theme.black};
+    color: #fff;
   }
 
   .react-datepicker__day:hover {
     background-color: ${({ theme }) => theme.primary};
   }
 
-  /* Remove the box-shadow */
+  .react-datepicker__day,
+  .react-datepicker__day-name,
+  .react-datepicker__current-month {
+    color: ${({ theme }) => theme.text_secondary};
+  }
+
+  .react-datepicker__day--disabled {
+    color: ${({ theme }) => theme.text_secondary};
+    opacity: 0.4; /* Make disabled/past dates transparent */
+    cursor: not-allowed; /* Indicate disabled state */
+  }
+
+  .react-datepicker__header {
+    background-color: ${({ theme }) => theme.bgLight};
+  }
+
   .react-datepicker {
-    box-shadow: none;
+    box-shadow: none; /* Remove default box shadow */
+    background-color: ${({ theme }) => theme.bgLight};
   }
 `;
+
 
 
 const AddWorkout = ({
@@ -149,7 +160,7 @@ const AddWorkout = ({
   addNewWorkout,
   buttonLoading
 }) => {
-  const { weightUnit } = useWeightUnit(); // Get weight unit from context
+  const { weightUnit } = useWeightUnit(); 
 
   const handleAddWorkout = () => {
     addNewWorkout();
@@ -158,7 +169,7 @@ const AddWorkout = ({
   const convertWeight = (weightValue) => {
     return weightUnit === 'kg'
       ? weightValue
-      : (weightValue * 2.20462).toFixed(2); // Convert to Lbs if needed
+      : (weightValue * 2.20462).toFixed(2);
   };
 
   return (
@@ -170,9 +181,10 @@ const AddWorkout = ({
         <DatePicker
           selected={date}
           onChange={(date) => setDate(date)}
+          minDate={new Date()}
           placeholderText="Select a date"
           dateFormat="MM.dd.yyyy"
-          locale="en-US" // Set the locale to English
+          locale="en-US"
         />
       </DatePickerWrapper>
 

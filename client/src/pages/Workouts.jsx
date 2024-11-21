@@ -8,6 +8,7 @@ import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
 import { deleteWorkout } from "../api";
 import { useWeightUnit } from "../context/WeightUnitContext";
+import { useTheme } from "styled-components";
 
 const Container = styled.div`
   flex: 1;
@@ -39,6 +40,8 @@ const Left = styled.div`
   box-shadow: 1px 6px 20px 0px ${({ theme }) => theme.primary + 15};
   background-color: ${({ theme }) => theme.chart_back};
 `;
+
+
 
 const Title = styled.div`
   font-weight: 600;
@@ -86,6 +89,7 @@ const Workouts = () => {
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
+  const theme = useTheme();
 
   const getTodaysWorkout = async () => {
     setLoading(true);
@@ -123,10 +127,24 @@ const Workouts = () => {
         <Left>
           <Title>Select Date</Title>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateCalendar
-              onChange={(e) => setDate(`${e.$M + 1}/${e.$D}/${e.$y}`)}
-            />
-          </LocalizationProvider>
+  <DateCalendar
+    onChange={(e) => setDate(`${e.$M + 1}/${e.$D}/${e.$y}`)}
+    sx={{
+        "& .MuiPickersDay-root": {
+          borderRadius: "50%",
+        },
+        "& .Mui-selected": {
+          backgroundColor: `${theme.primary} !important`,
+          color: "white !important", 
+        },
+        "& .Mui-selected:hover": {
+          backgroundColor: `${theme.primaryLight} !important`,
+        },
+      }}
+  />
+</LocalizationProvider>
+
+
         </Left>
         <Right>
           <Section>
