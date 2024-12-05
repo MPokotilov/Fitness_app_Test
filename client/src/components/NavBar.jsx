@@ -160,7 +160,6 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
         </Mobileicon>
         <NavLogo to="/">
           <Logo src={LogoImg} />
-          MastaFit
         </NavLogo>
 
         <NavItems>
