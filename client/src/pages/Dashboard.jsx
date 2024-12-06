@@ -132,33 +132,44 @@ const Dashboard = () => {
         alert("Please fill in all the fields.");
         setButtonLoading(false);
         return;
-      }
-    
-      const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-      const formattedDate = adjustedDate.toISOString().split('T')[0];
+    }
+
+    const adjustedDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+    const formattedDate = adjustedDate.toISOString().split('T')[0];
 
     // Construct workout data from individual fields
     const workoutData = {
-      date: formattedDate,
-      category,
-      exerciseName,
-      sets,
-      reps,
-      weight,
-      time,
+        date: formattedDate,
+        category,
+        exerciseName,
+        sets,
+        reps,
+        weight,
+        time,
     };
 
-    await addWorkout(token, workoutData)
-      .then((res) => {
+    try {
+        await addWorkout(token, workoutData);
         dashboardData();
         getTodaysWorkout();
+    } catch (err) {
+        if (
+            err.response &&
+            err.response.data &&
+            err.response.data.message &&
+            err.response.data.message.includes("E11000 duplicate key error")
+        ) {
+            // Catch MongoDB duplicate key error
+            alert("Please change the name of the exercise.");
+        } else {
+            // Handle other errors
+            alert(err.response?.data?.message || "An error occurred while adding the workout.");
+        }
+    } finally {
         setButtonLoading(false);
-      })
-      .catch((err) => {
-        alert(err.response.data.message);
-        setButtonLoading(false);
-      });
-  };
+    }
+};
+
 
   useEffect(() => {
     dashboardData();
