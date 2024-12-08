@@ -140,6 +140,11 @@ const DatePickerWrapper = styled.div`
   }
 `;
 
+const ErrorMessage = styled.div`
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+`;
 
 
 const AddWorkout = ({
@@ -158,7 +163,8 @@ const AddWorkout = ({
   time,
   setTime,
   addNewWorkout,
-  buttonLoading
+  buttonLoading,
+  errorMessage,
 }) => {
   const { weightUnit } = useWeightUnit(); 
 
@@ -181,7 +187,6 @@ const AddWorkout = ({
         <DatePicker
           selected={date}
           onChange={(date) => setDate(date)}
-          minDate={new Date()}
           placeholderText="Select a date"
           dateFormat="MM.dd.yyyy"
           locale="en-US"
