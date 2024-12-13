@@ -79,7 +79,7 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
   }, [labels, data, theme]);
 
   useEffect(() => {
-    // Запускаем анимацию только если флаг showCops активирован
+    
     if (showCops) {
       animateCyclist();
     }
@@ -93,14 +93,14 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
       return;
     }
   
-    // Получаем координаты всех точек графика
+    
     const positions = points.map((point) => ({
       x: point.getProps(['x'], true).x,
       y: point.getProps(['y'], true).y,
     }));
   
     let frame = 0;
-    const totalFrames = 200; // Количество кадров для плавности анимации
+    const totalFrames = 200;
   
     const animate = () => {
       if (frame >= totalFrames) return;
@@ -115,13 +115,13 @@ const WeightProgressChart = ({ labels, data, theme, showCops }) => {
       const currentPoint = positions[currentIndex];
       const nextPoint = positions[currentIndex + 1];
   
-      // Линейная интерполяция для вычисления текущей позиции между двумя точками графика
+     
       const x = currentPoint.x + (nextPoint.x - currentPoint.x) * t;
       const y = currentPoint.y + (nextPoint.y - currentPoint.y) * t;
   
-      // Привязка положения велосипедиста точно к линии графика
-      cyclistRef.current.style.left = `${x - 25}px`;  // Центрируем велосипедиста по X
-      cyclistRef.current.style.top = `${y - 25}px`;   // Центрируем по Y
+      
+      cyclistRef.current.style.left = `${x - 25}px`;  
+      cyclistRef.current.style.top = `${y - 25}px`;   
   
 
       copCarRef.current.style.left = `${x - 95}px`;

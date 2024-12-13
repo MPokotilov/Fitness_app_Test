@@ -144,7 +144,7 @@ const CalorieTrackerPage = () => {
             <Title>Calorie Tracker</Title>
 
             <Label>Gender:</Label>
-            <StyledSelect ref={genderRef}>
+            <StyledSelect ref={genderRef} data-testid="select-gender">
               <option value="male">Male</option>
               <option value="female">Female</option>
             </StyledSelect>
@@ -153,6 +153,7 @@ const CalorieTrackerPage = () => {
             <Input
               type="number"
               ref={ageRef}
+              data-testid="input-age"
               placeholder="Enter age"
               onKeyDown={preventNegativeInput}
             />
@@ -161,6 +162,7 @@ const CalorieTrackerPage = () => {
             <Input
               type="number"
               ref={heightRef}
+              data-testid="input-height"
               placeholder="Enter height in cm"
               onKeyDown={preventNegativeInput}
             />
@@ -169,6 +171,7 @@ const CalorieTrackerPage = () => {
             <Input
               type="number"
               ref={currentWeightRef}
+              data-testid="input-current-weight"
               placeholder={`Enter current weight in ${weightUnit}`}
               onKeyDown={preventNegativeInput}
             />
@@ -179,6 +182,7 @@ const CalorieTrackerPage = () => {
                 <Input
                   type="number"
                   ref={targetWeightRef}
+                  data-testid="input-target-weight"
                   placeholder={`Enter target weight in ${weightUnit}`}
                   onKeyDown={preventNegativeInput}
                 />
@@ -197,14 +201,18 @@ const CalorieTrackerPage = () => {
             </DatePickerWrapper>
 
             <Label>Goal:</Label>
-            <StyledSelect value={goal} onChange={(e) => setGoal(e.target.value)}>
+            <StyledSelect
+              value={goal}
+              data-testid="input-goal"
+              onChange={(e) => setGoal(e.target.value)}
+            >
               <option value="weight_loss">Weight Loss</option>
               <option value="maintenance">Maintenance</option>
               <option value="weight_gain">Weight Gain</option>
             </StyledSelect>
 
             <Label>Activity Level:</Label>
-            <StyledSelect ref={activityLevelRef}>
+            <StyledSelect ref={activityLevelRef} data-testid="input-activity-level">
               <option value="1.2">Sedentary (little or no exercise)</option>
               <option value="1.375">Lightly active</option>
               <option value="1.55">Moderately active</option>
@@ -225,7 +233,7 @@ const CalorieTrackerPage = () => {
             data={data}
             theme={{ primary: "#4e73df", bgLight: "#f8f9fc", text_primary: "#858796" }}
             goal={goal}
-            currentWeight={currentWeightRef.current.value}
+            currentWeight={currentWeightRef.current?.value || 0}
             showCops={showCops}
           />
         </ContentContainer>
