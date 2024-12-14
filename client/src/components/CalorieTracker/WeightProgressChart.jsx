@@ -153,16 +153,33 @@ export default WeightProgressChart;
 // Стили
 const ChartWrapper = styled.div`
   position: relative;
-  width: 60%;
-  height: 800px;
+  width: 60%; 
+  height: 800px; 
+
+  @media screen and (max-width: 768px) {
+    width: 100%; 
+    height: 400px; 
+  }
+
+  @media screen and (max-width: 480px) {
+    height: 300px; 
+  }
 `;
 
 const CyclistImage = styled.img`
   position: absolute;
-  width: 60px;
+  width: 60px; 
   height: auto;
   left: 0;
   top: 0;
+  
+  @media screen and (max-width: 768px) {
+    width: 40px; 
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 30px; 
+  }
 `;
 
 const CopCarImage = styled.img`
@@ -171,4 +188,14 @@ const CopCarImage = styled.img`
   height: 70px;
   left: 0;
   top: 0;
+ 
+  @media screen and (max-width: 768px) {
+    width: 60px; 
+    height: 60px;
+  }
+
+  @media screen and (max-width: 480px) {
+    width: 40px; 
+    height: 40px;
+  }
 `;

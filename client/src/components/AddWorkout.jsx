@@ -73,33 +73,38 @@ const InputSets = styled.input`
   border-radius: 8px;
   background-color: ${({ theme }) => theme.bgLight};
   
+  @media (max-width: 375px) {
+  width: 90%;
+  }
 `;
+
 
 const Row = styled.div`
   display: flex;
   gap: 10px;
+  
 `;
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
-    display: flex; /* Ensure alignment with other inputs */
-    width: 100%; /* Match the width of other inputs */
+    display: flex; 
+    width: 100%; 
   }
 
   .react-datepicker__input-container {
-    width: 100%; /* Ensure full width for the input */
+    width: 100%; 
   }
 
   .react-datepicker__input-container input {
-    width: 100%; /* Make input take full width */
-    padding: 12px 15px; /* Match padding of other inputs */
-    margin-bottom: 15px; /* Match spacing of other inputs */
+    width: 100%; 
+    padding: 12px 15px; 
+    margin-bottom: 15px; 
     border: 1px solid ${({ theme }) => theme.text_secondary};
     border-radius: 5px;
     font-size: 14px;
     color: ${({ theme }) => theme.text_primary};
     background-color: ${({ theme }) => theme.bgLight};
-    box-sizing: border-box; /* Ensure consistent box model */
+    box-sizing: border-box; 
 
     &:focus {
       outline: none;
@@ -126,8 +131,8 @@ const DatePickerWrapper = styled.div`
 
   .react-datepicker__day--disabled {
     color: ${({ theme }) => theme.text_secondary};
-    opacity: 0.4; /* Make disabled/past dates transparent */
-    cursor: not-allowed; /* Indicate disabled state */
+    opacity: 0.4; 
+    cursor: not-allowed; 
   }
 
   .react-datepicker__header {
@@ -135,7 +140,7 @@ const DatePickerWrapper = styled.div`
   }
 
   .react-datepicker {
-    box-shadow: none; /* Remove default box shadow */
+    box-shadow: none; 
     background-color: ${({ theme }) => theme.bgLight};
   }
 `;

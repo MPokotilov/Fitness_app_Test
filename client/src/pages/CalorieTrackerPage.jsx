@@ -38,14 +38,12 @@ const CalorieTrackerPage = () => {
   const calculateDailyCalories = (event) => {
     event.preventDefault();
 
-    // Safely access refs with null checks
     const gender = genderRef.current?.value || "male";
     const age = parseInt(ageRef.current?.value || "0", 10);
     const height = parseInt(heightRef.current?.value || "0", 10);
     const currentWeight = parseFloat(currentWeightRef.current?.value || "0");
     const activityLevel = parseFloat(activityLevelRef.current?.value || "1.2");
 
-    // Ensure targetWeight is only accessed if needed
     const targetWeight =
       goal !== "maintenance"
         ? parseFloat(targetWeightRef.current?.value || "0")
@@ -73,7 +71,7 @@ const CalorieTrackerPage = () => {
       return;
     }
 
-    // Convert weight if necessary
+    // Convert weight 
     const currentWeightKg =
       weightUnit === "lbs" ? currentWeight / 2.20462 : currentWeight;
     const targetWeightKg =
@@ -132,7 +130,7 @@ const CalorieTrackerPage = () => {
 
   useEffect(() => {
     if (goal === "maintenance") {
-      setErrorMessage(""); // Clear errors if goal changes to maintenance
+      setErrorMessage(""); 
     }
   }, [goal]);
 
@@ -251,16 +249,25 @@ const Container = styled.div`
   margin: 0 auto;
   background-color: ${({ theme }) => theme.bg};
   overflow-y: scroll;
+
+  @media screen and (max-width: 768px) {
+    padding: 10px;
+    max-width: 100%; 
+  }
 `;
 
 const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 90px;
+  padding: 40px; 
   border-radius: 8px;
   background-color: ${({ theme }) => theme.card};
   box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
+
+  @media screen and (max-width: 768px) {
+    padding: 20px; 
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -268,20 +275,33 @@ const ContentContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  gap: 50px; /* Add space between the form and graph */
-`;
+  gap: 50px; 
 
+  @media screen and (max-width: 768px) {
+    flex-direction: column; 
+    gap: 20px; 
+  }
+`;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   flex: 1;
   max-width: 500px;
+
+  @media screen and (max-width: 768px) {
+    max-width: 100%; 
+  }
 `;
 
 const Title = styled.h2`
   margin-bottom: 20px;
   color: ${({ theme }) => theme.primary};
+  text-align: center;
+
+  @media screen and (max-width: 768px) {
+    font-size: 18px; 
+  }
 `;
 
 const Button = styled.button`
@@ -298,6 +318,11 @@ const Button = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.secondary};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px; /* Adjust font size for mobile */
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
 `;
 
 const Result = styled.p`
@@ -305,19 +330,20 @@ const Result = styled.p`
   font-size: 18px;
   color: ${({ theme }) => theme.green};
   font-weight: bold;
-`;
 
-const Error = styled.p`
-  color: ${({ theme }) => theme.red};
-  margin-top: 5px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  @media screen and (max-width: 768px) {
+    font-size: 16px; 
+  }
 `;
 
 const Label = styled.label`
   margin-bottom: 5px;
   font-weight: bold;
   color: ${({ theme }) => theme.text_primary};
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px; 
+  }
 `;
 
 const Input = styled.input`
@@ -330,11 +356,16 @@ const Input = styled.input`
   background-color: ${({ theme }) => theme.bgLight};
   box-sizing: border-box;
   margin-bottom: 15px;
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.primary};
     background-color: ${({ theme }) => theme.bgLight};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 12px; 
+    padding: 10px; 
 `;
 
 const StyledSelect = styled.select`
@@ -346,34 +377,46 @@ const StyledSelect = styled.select`
   color: ${({ theme }) => theme.text_primary};
   background-color: ${({ theme }) => theme.card};
   margin-bottom: 15px;
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.primary};
     background-color: ${({ theme }) => theme.bgLight};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 12px; 
+    padding: 10px; 
+  }
+`;
+
+const Error = styled.p`
+  color: ${({ theme }) => theme.red};
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
 `;
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
-    display: flex; /* Ensure alignment with other inputs */
-    width: 100%; /* Match the width of other inputs */
+    display: flex; /
+    width: 100%; 
   }
 
   .react-datepicker__input-container {
-    width: 100%; /* Ensure full width for the input */
+    width: 100%; 
   }
 
   .react-datepicker__input-container input {
-    width: 100%; /* Make input take full width */
-    padding: 12px 15px; /* Match padding of other inputs */
-    margin-bottom: 15px; /* Match spacing of other inputs */
+    width: 100%; 
+    padding: 12px 15px; 
+    margin-bottom: 15px; 
     border: 1px solid ${({ theme }) => theme.text_secondary};
     border-radius: 5px;
     font-size: 14px;
     color: ${({ theme }) => theme.text_primary};
     background-color: ${({ theme }) => theme.bgLight};
-    box-sizing: border-box; /* Ensure consistent box model */
-
+    box-sizing: border-box; 
     &:focus {
       outline: none;
       border-color: ${({ theme }) => theme.primary};
@@ -401,8 +444,8 @@ const DatePickerWrapper = styled.div`
 
   .react-datepicker__day--disabled {
     color: ${({ theme }) => theme.text_secondary};
-    opacity: 0.4; /* Make disabled/past dates transparent */
-    cursor: not-allowed; /* Indicate disabled state */
+    opacity: 0.4; 
+    cursor: not-allowed; 
   }
 
   .react-datepicker__header {

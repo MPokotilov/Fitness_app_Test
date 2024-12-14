@@ -117,6 +117,7 @@ export default SettingsDropdown;
 // Styled Components
 const DropdownContainer = styled.div`
   position: relative;
+  right: 30px;
 `;
 
 const DropdownMenu = styled.div`
