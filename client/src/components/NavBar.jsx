@@ -7,9 +7,7 @@ import { MenuRounded } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/reducers/userSlice";
-import ProfileDropdown from './SettingsDropdown'; // Updated import path
-
-
+import ProfileDropdown from './SettingsDropdown'; 
 
 const Nav = styled.div`
   background-color: ${({ theme }) => theme.bg};
