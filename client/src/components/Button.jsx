@@ -16,9 +16,12 @@ const Button = styled.div`
   padding: 16px 26px;
   box-shadow: 1px 20px 35px 0px ${({ theme }) => theme.primary + 40};
   border: 1px solid ${({ theme }) => theme.primary};
-  @media (max-width: 600px) {
-    padding: 8px 12px;
+ @media (max-width: 600px) {
+    padding: 8px 16px; 
+    font-size: 14px; 
+    height: 35px; 
   }
+
 
   ${({ type, theme }) =>
     type === "secondary"

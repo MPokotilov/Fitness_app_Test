@@ -20,6 +20,7 @@ const Container = styled.div`
     flex-direction: row;
     padding: 50px;
   }
+    
 `;
 
 const ImageWrapper = styled.div`

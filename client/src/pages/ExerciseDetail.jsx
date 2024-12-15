@@ -4,6 +4,15 @@ import { fetchData, exerciseOptions } from '../utils/exerciseApi';
 import Detail from '../components/Detail';
 import styled from 'styled-components';
 
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  overflow-y: auto; 
+`;
+
+
 const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -15,6 +24,7 @@ const LoadingContainer = styled.div`
   text-align: center;
   background-color: ${({ theme }) => theme.bg};
   border-radius: 8px;
+  
 `;
 
 const ErrorMessage = styled.p`
@@ -60,10 +70,11 @@ const ExerciseDetail = () => {
   }
 
   return (
-    <div>
+    <PageContainer>
       {exerciseDetail && <Detail exerciseDetail={exerciseDetail} />}
-    </div>
+    </PageContainer>
   );
+  
 };
 
 export default ExerciseDetail;

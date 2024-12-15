@@ -1,48 +1,57 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
-import WeightProgressChart from '../components/CalorieTracker/WeightProgressChart';
-import { useWeightUnit } from '../context/WeightUnitContext';
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import styled from "styled-components";
+import WeightProgressChart from "../components/CalorieTracker/WeightProgressChart";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import { useWeightUnit } from "../context/WeightUnitContext";
 
 const CalorieTrackerPage = () => {
-  const [currentWeight, setCurrentWeight] = useState("");
-  const [targetWeight, setTargetWeight] = useState("");
-  const [showTargetWeight, setShowTargetWeight] = useState(true);
-  const [targetDate, setTargetDate] = useState("");
+  const genderRef = useRef("male");
+  const ageRef = useRef("");
+  const heightRef = useRef("");
+  const currentWeightRef = useRef("");
+  const targetWeightRef = useRef("");
+  const activityLevelRef = useRef(1.2);
+
+  const [targetDate, setTargetDate] = useState(null); // Use state only for the date
+  const [goal, setGoal] = useState("weight_loss"); // Changed to state
   const [dailyCalories, setDailyCalories] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [age, setAge] = useState("");
-  const [height, setHeight] = useState("");
-  const [gender, setGender] = useState("male");
-  const [goal, setGoal] = useState("weight_loss");
-  const [activityLevel, setActivityLevel] = useState(1.2);
   const [labels, setLabels] = useState([]);
   const [data, setData] = useState([]);
   const [showCops, setShowCops] = useState(false);
-  const { weightUnit } = useWeightUnit();
-  const today = new Date().toLocaleDateString('en-CA');
 
+  const { weightUnit } = useWeightUnit();
+
+  // Prevent invalid input (negative, letters, etc.)
   const preventNegativeInput = useCallback((e) => {
-    if (e.key === "-" || e.key === "+" || e.key === "e" || isNaN(Number(e.key)) && e.key !== "Backspace") {
+    if (
+      e.key === "-" ||
+      e.key === "+" ||
+      e.key === "e" ||
+      (isNaN(Number(e.key)) && e.key !== "Backspace")
+    ) {
       e.preventDefault();
     }
   }, []);
 
-  const convertWeight = (weight, unit) => {
-    if (unit === "lbs") {
-      return (weight * 2.20462).toFixed(2);
-    } else {
-      return (weight / 2.20462).toFixed(2);
-    }
-  };
-
   const calculateDailyCalories = (event) => {
     event.preventDefault();
+
+    const gender = genderRef.current?.value || "male";
+    const age = parseInt(ageRef.current?.value || "0", 10);
+    const height = parseInt(heightRef.current?.value || "0", 10);
+    const currentWeight = parseFloat(currentWeightRef.current?.value || "0");
+    const activityLevel = parseFloat(activityLevelRef.current?.value || "1.2");
+
+    const targetWeight =
+      goal !== "maintenance"
+        ? parseFloat(targetWeightRef.current?.value || "0")
+        : null;
+
     setErrorMessage("");
 
-    if (!currentWeight || !targetDate || !age || !height || !gender || !goal) {
+    if (!currentWeight || !targetDate || !age || !height || !goal) {
       setErrorMessage("Please fill out all fields.");
       return;
     }
@@ -52,8 +61,6 @@ const CalorieTrackerPage = () => {
       return;
     }
 
-    const currentW = weightUnit === "lbs" ? parseFloat(currentWeight) / 2.20462 : parseFloat(currentWeight);
-    const targetW = goal !== "maintenance" ? (weightUnit === "lbs" ? parseFloat(targetWeight) / 2.20462 : parseFloat(targetWeight)) : currentW;
     const targetD = new Date(targetDate);
     const today = new Date();
     const timeDiff = targetD.getTime() - today.getTime();
@@ -64,96 +71,66 @@ const CalorieTrackerPage = () => {
       return;
     }
 
-    if (goal === "weight_loss" && targetW >= currentW) {
+    // Convert weight 
+    const currentWeightKg =
+      weightUnit === "lbs" ? currentWeight / 2.20462 : currentWeight;
+    const targetWeightKg =
+      goal !== "maintenance"
+        ? weightUnit === "lbs"
+          ? targetWeight / 2.20462
+          : targetWeight
+        : currentWeightKg;
+
+    const weightDifference = goal === "maintenance" ? 0 : targetWeightKg - currentWeightKg;
+
+    if (goal === "weight_loss" && weightDifference >= 0) {
       setErrorMessage("Target weight must be less than current weight for weight loss.");
       return;
-    } else if (goal === "weight_gain" && targetW <= currentW) {
+    }
+
+    if (goal === "weight_gain" && weightDifference <= 0) {
       setErrorMessage("Target weight must be greater than current weight for weight gain.");
       return;
     }
 
-    const ageNum = parseInt(age);
-    const heightNum = parseInt(height);
-
-    let BMR;
-    if (gender === "male") {
-      BMR = (10 * currentW) + (6.25 * heightNum) - (5 * ageNum) + 5;
-    } else {
-      BMR = (10 * currentW) + (6.25 * heightNum) - (5 * ageNum) - 161;
-    }
+    const BMR =
+      gender === "male"
+        ? 10 * currentWeightKg + 6.25 * height - 5 * age + 5
+        : 10 * currentWeightKg + 6.25 * height - 5 * age - 161;
 
     const adjustedBMR = BMR * activityLevel;
-    let dailyCalories;
-    const weightDifference = targetW - currentW;
-    const monthsDiff = targetD.getMonth() - today.getMonth() + (12 * (targetD.getFullYear() - today.getFullYear()));
 
-    if (goal === "weight_loss") {
-      const maxDeficit = adjustedBMR * 0.3;
-      const totalCaloriesToBurn = (currentW - targetW) * 7700;
-      const dailyCalorieDeficit = totalCaloriesToBurn / daysDiff;
+    let dailyCalories = adjustedBMR;
+    if (goal === "weight_loss" || goal === "weight_gain") {
+      const totalCalories = weightDifference * 7700;
+      const dailyChange = totalCalories / daysDiff;
 
-      if (dailyCalorieDeficit > maxDeficit) {
-        setErrorMessage("The selected period is too short for healthy weight loss. Please choose a longer period.");
-        return;
-      }
-
-      dailyCalories = adjustedBMR - dailyCalorieDeficit;
-    } else if (goal === "weight_gain") {
-      const maxSurplus = adjustedBMR * 0.3;
-      const totalCaloriesToGain = (targetW - currentW) * 7700;
-      const dailyCalorieSurplus = totalCaloriesToGain / daysDiff;
-
-      if (dailyCalorieSurplus > maxSurplus) {
-        setErrorMessage("The selected period is too short for healthy weight gain. Please choose a longer period.");
-        return;
-      }
-
-      dailyCalories = adjustedBMR + dailyCalorieSurplus;
-    } else {
-      dailyCalories = adjustedBMR;
+      dailyCalories =
+        goal === "weight_loss" ? adjustedBMR - dailyChange : adjustedBMR + dailyChange;
     }
 
-    setDailyCalories(dailyCalories);
+    setDailyCalories(Math.round(dailyCalories));
 
-    if (daysDiff <= 31) {
-      const newLabels = Array.from({ length: daysDiff + 1 }, (_, i) => {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        return date.toLocaleDateString('default', { day: 'numeric' });
-      });
+    const newLabels = Array.from({ length: daysDiff + 1 }, (_, i) => {
+      const date = new Date();
+      date.setDate(today.getDate() + i);
+      return date.toLocaleDateString("default", { day: "numeric", month: "short" });
+    });
 
-      const weightData = Array.from({ length: daysDiff + 1 }, (_, i) => {
-        return currentW + (weightDifference * (i / daysDiff));
-      });
+    const weightData = Array.from({ length: daysDiff + 1 }, (_, i) => {
+      return currentWeightKg + (weightDifference * i) / daysDiff;
+    });
 
-      setLabels(newLabels);
-      setData(weightData);
-    } else {
-      const newLabels = Array.from({ length: monthsDiff + 1 }, (_, i) => {
-        const date = new Date(today);
-        date.setMonth(today.getMonth() + i);
-        return date.toLocaleString('default', { month: 'short' });
-      });
-
-      const weightData = Array.from({ length: monthsDiff + 1 }, (_, i) => {
-        return currentW + (weightDifference * (i / monthsDiff));
-      });
-
-      setLabels(newLabels);
-      setData(weightData);
-    }
+    setLabels(newLabels);
+    setData(weightData);
 
     setShowCops(false);
-    setTimeout(() => {
-      setShowCops(true);
-    }, 0);
+    setTimeout(() => setShowCops(true), 0);
   };
 
   useEffect(() => {
     if (goal === "maintenance") {
-      setShowTargetWeight(false);
-    } else {
-      setShowTargetWeight(true);
+      setErrorMessage(""); 
     }
   }, [goal]);
 
@@ -165,7 +142,7 @@ const CalorieTrackerPage = () => {
             <Title>Calorie Tracker</Title>
 
             <Label>Gender:</Label>
-            <StyledSelect value={gender} onChange={(e) => setGender(e.target.value)}>
+            <StyledSelect ref={genderRef} data-testid="select-gender">
               <option value="male">Male</option>
               <option value="female">Female</option>
             </StyledSelect>
@@ -173,44 +150,43 @@ const CalorieTrackerPage = () => {
             <Label>Age (Years):</Label>
             <Input
               type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
+              ref={ageRef}
+              data-testid="input-age"
               placeholder="Enter age"
               onKeyDown={preventNegativeInput}
-              min="1"
             />
 
             <Label>Height (cm):</Label>
             <Input
               type="number"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
+              ref={heightRef}
+              data-testid="input-height"
               placeholder="Enter height in cm"
               onKeyDown={preventNegativeInput}
-              min="1"
             />
 
             <Label>Current weight ({weightUnit}):</Label>
             <Input
               type="number"
-              value={currentWeight}
-              onChange={(e) => setCurrentWeight(e.target.value)}
+              ref={currentWeightRef}
+              data-testid="input-current-weight"
               placeholder={`Enter current weight in ${weightUnit}`}
               onKeyDown={preventNegativeInput}
-              min="1"
             />
 
-            {showTargetWeight && (
+            {goal !== "maintenance" && (
               <>
                 <Label>Target weight ({weightUnit}):</Label>
                 <Input
                   type="number"
-                  value={targetWeight}
-                  onChange={(e) => setTargetWeight(e.target.value)}
+                  ref={targetWeightRef}
+                  data-testid="input-target-weight"
                   placeholder={`Enter target weight in ${weightUnit}`}
+                  onKeyDown={preventNegativeInput}
                 />
               </>
             )}
+
             <Label>Target date:</Label>
             <DatePickerWrapper>
               <DatePicker
@@ -219,36 +195,34 @@ const CalorieTrackerPage = () => {
                 minDate={new Date()}
                 dateFormat="yyyy-MM-dd"
                 placeholderText="Select a target date"
-                
               />
             </DatePickerWrapper>
 
-
-
-
-
             <Label>Goal:</Label>
-            <StyledSelect value={goal} onChange={(e) => setGoal(e.target.value)}>
+            <StyledSelect
+              value={goal}
+              data-testid="input-goal"
+              onChange={(e) => setGoal(e.target.value)}
+            >
               <option value="weight_loss">Weight Loss</option>
               <option value="maintenance">Maintenance</option>
               <option value="weight_gain">Weight Gain</option>
             </StyledSelect>
 
             <Label>Activity Level:</Label>
-            <StyledSelect value={activityLevel} onChange={(e) => setActivityLevel(parseFloat(e.target.value))}>
+            <StyledSelect ref={activityLevelRef} data-testid="input-activity-level">
               <option value="1.2">Sedentary (little or no exercise)</option>
-              <option value="1.375">Lightly active (light exercise/sports 1-3 days/week)</option>
-              <option value="1.55">Moderately active (moderate exercise/sports 3-5 days/week)</option>
-              <option value="1.725">Very active (hard exercise/sports 6-7 days a week)</option>
-              <option value="1.9">Super active (very hard exercise/sports & a physical job)</option>
+              <option value="1.375">Lightly active</option>
+              <option value="1.55">Moderately active</option>
+              <option value="1.725">Very active</option>
+              <option value="1.9">Super active</option>
             </StyledSelect>
 
             {errorMessage && <Error>{errorMessage}</Error>}
 
             <Button type="submit">Calculate</Button>
-
             {dailyCalories && (
-              <Result>Your daily calorie intake should be: {Math.round(dailyCalories)} kcal/day</Result>
+              <Result>Your daily calorie intake should be: {dailyCalories} kcal/day</Result>
             )}
           </Form>
 
@@ -257,7 +231,7 @@ const CalorieTrackerPage = () => {
             data={data}
             theme={{ primary: "#4e73df", bgLight: "#f8f9fc", text_primary: "#858796" }}
             goal={goal}
-            currentWeight={currentWeight}
+            currentWeight={currentWeightRef.current?.value || 0}
             showCops={showCops}
           />
         </ContentContainer>
@@ -275,16 +249,25 @@ const Container = styled.div`
   margin: 0 auto;
   background-color: ${({ theme }) => theme.bg};
   overflow-y: scroll;
+
+  @media screen and (max-width: 768px) {
+    padding: 10px;
+    max-width: 100%; 
+  }
 `;
 
 const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 40px; 
   border-radius: 8px;
   background-color: ${({ theme }) => theme.card};
   box-shadow: 0 0 15px rgba(58, 59, 69, 0.15);
+
+  @media screen and (max-width: 768px) {
+    padding: 20px; 
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -292,6 +275,12 @@ const ContentContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+  gap: 50px; 
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column; 
+    gap: 20px; 
+  }
 `;
 
 const Form = styled.form`
@@ -299,11 +288,20 @@ const Form = styled.form`
   flex-direction: column;
   flex: 1;
   max-width: 500px;
+
+  @media screen and (max-width: 768px) {
+    max-width: 100%; 
+  }
 `;
 
 const Title = styled.h2`
   margin-bottom: 20px;
   color: ${({ theme }) => theme.primary};
+  text-align: center;
+
+  @media screen and (max-width: 768px) {
+    font-size: 18px; 
+  }
 `;
 
 const Button = styled.button`
@@ -320,6 +318,11 @@ const Button = styled.button`
   &:hover {
     background-color: ${({ theme }) => theme.secondary};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px; /* Adjust font size for mobile */
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
 `;
 
 const Result = styled.p`
@@ -327,19 +330,20 @@ const Result = styled.p`
   font-size: 18px;
   color: ${({ theme }) => theme.green};
   font-weight: bold;
-`;
 
-const Error = styled.p`
-  color: ${({ theme }) => theme.red};
-  margin-top: 5px;
-  margin-bottom: 10px;
-  font-weight: bold;
+  @media screen and (max-width: 768px) {
+    font-size: 16px; 
+  }
 `;
 
 const Label = styled.label`
   margin-bottom: 5px;
   font-weight: bold;
   color: ${({ theme }) => theme.text_primary};
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px; 
+  }
 `;
 
 const Input = styled.input`
@@ -352,11 +356,16 @@ const Input = styled.input`
   background-color: ${({ theme }) => theme.bgLight};
   box-sizing: border-box;
   margin-bottom: 15px;
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.primary};
     background-color: ${({ theme }) => theme.bgLight};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 12px; 
+    padding: 10px; 
 `;
 
 const StyledSelect = styled.select`
@@ -368,34 +377,46 @@ const StyledSelect = styled.select`
   color: ${({ theme }) => theme.text_primary};
   background-color: ${({ theme }) => theme.card};
   margin-bottom: 15px;
+
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.primary};
     background-color: ${({ theme }) => theme.bgLight};
   }
+
+  @media screen and (max-width: 768px) {
+    font-size: 12px; 
+    padding: 10px; 
+  }
+`;
+
+const Error = styled.p`
+  color: ${({ theme }) => theme.red};
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
 `;
 
 const DatePickerWrapper = styled.div`
   .react-datepicker-wrapper {
-    display: flex; /* Ensure alignment with other inputs */
-    width: 100%; /* Match the width of other inputs */
+    display: flex; /
+    width: 100%; 
   }
 
   .react-datepicker__input-container {
-    width: 100%; /* Ensure full width for the input */
+    width: 100%; 
   }
 
   .react-datepicker__input-container input {
-    width: 100%; /* Make input take full width */
-    padding: 12px 15px; /* Match padding of other inputs */
-    margin-bottom: 15px; /* Match spacing of other inputs */
+    width: 100%; 
+    padding: 12px 15px; 
+    margin-bottom: 15px; 
     border: 1px solid ${({ theme }) => theme.text_secondary};
     border-radius: 5px;
     font-size: 14px;
     color: ${({ theme }) => theme.text_primary};
     background-color: ${({ theme }) => theme.bgLight};
-    box-sizing: border-box; /* Ensure consistent box model */
-
+    box-sizing: border-box; 
     &:focus {
       outline: none;
       border-color: ${({ theme }) => theme.primary};
@@ -423,8 +444,8 @@ const DatePickerWrapper = styled.div`
 
   .react-datepicker__day--disabled {
     color: ${({ theme }) => theme.text_secondary};
-    opacity: 0.4; /* Make disabled/past dates transparent */
-    cursor: not-allowed; /* Indicate disabled state */
+    opacity: 0.4; 
+    cursor: not-allowed; 
   }
 
   .react-datepicker__header {

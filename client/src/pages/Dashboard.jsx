@@ -25,6 +25,10 @@ const Wrapper = styled.div`
   gap: 22px;
   @media (max-width: 600px) {
     gap: 12px;
+   
+  }
+  @media (max-width: 375px) {
+    max-width: 350px;
   }
 `;
 

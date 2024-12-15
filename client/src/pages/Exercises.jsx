@@ -21,36 +21,40 @@ const SearchBarContainer = styled.div`
   top: 0;
   background-color: transparent;
   padding: 10px 0;
-  z-index: 10;
-  width: 50%;
+  z-index: 5;
+  width: 80%; 
   margin: 0 auto;
+
+  @media (max-width: 600px) {
+    width: 90%; 
+    padding: 8px 0; 
 `;
+
 
 const SearchBar = styled.div`
   display: flex;
   justify-content: center;
-  align-items: stretch; /* Stretch items to fill the container's height */
+  align-items: stretch; 
   position: relative;
 `;
 
 const InputContainer = styled.div`
   position: relative;
-  margin-right: 10px; /* Space between input and button */
-  width: 50%; /* Desired width of the input field */
-  height: 55px; /* Set the same height as the button */
-  
+  margin-right: 10px; 
+  width: 50%; 
+  height: 55px; 
 `;
 
 const Input = styled.input`
   padding: 0 10px;
   width: 100%;
-  height: 100%; /* Fill the InputContainer's height */
+  height: 100%; 
   border: 1px solid ${({ theme }) => theme.text_primary};
   border-radius: 5px;
   background-color: ${({ theme }) => theme.bgLight};
   color: ${({ theme }) => theme.text_primary};
   font-size: 16px;
-  box-sizing: border-box; /* Include padding and border in height */
+  box-sizing: border-box; 
 `;
 
 const SuggestionsList = styled.ul`
@@ -64,8 +68,7 @@ const SuggestionsList = styled.ul`
   border-radius: 5px;
   overflow-y: auto;
   position: absolute;
-  top: 100%; /* Position below the input field */
-  left: 0;
+  top: 100%; 
   z-index: 1000;
 `;
 

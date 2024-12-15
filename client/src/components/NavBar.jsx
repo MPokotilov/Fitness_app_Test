@@ -10,6 +10,7 @@ import { logout } from "../redux/reducers/userSlice";
 import ProfileDropdown from './SettingsDropdown'; // Updated import path
 
 
+
 const Nav = styled.div`
   background-color: ${({ theme }) => theme.bg};
   height: 80px;
@@ -59,6 +60,30 @@ const Mobileicon = styled.div`
     align-items: center;
   }
 `;
+
+const MobileMenu = styled.div`
+  position: fixed;
+  top: 50px; // Same height as the navbar
+  left: 0;
+  width: 50%;
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.bg};
+  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+  flex-direction: column;
+  padding: 16px;
+  z-index: 10;
+
+  a {
+    text-decoration: none;
+    color: ${({ theme }) => theme.text_primary};
+    padding: 12px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.text_secondary + 20};
+    &:hover {
+      color: ${({ theme }) => theme.primary};
+    }
+  }
+`;
+
 
 const NavItems = styled.ul`
   width: 100%;
@@ -152,15 +177,16 @@ const ToggleButton = styled.input`
 
 const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
   const dispatch = useDispatch();
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <Nav>
       <NavContainer>
-        <Mobileicon>
+        <Mobileicon onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}>
           <MenuRounded sx={{ color: "inherit" }} />
         </Mobileicon>
+
         <NavLogo to="/">
           <Logo src={LogoImg} />
-          MastaFit
         </NavLogo>
 
         <NavItems>
@@ -168,8 +194,16 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
           <Navlink to="/workouts">Workouts</Navlink>
           <Navlink to="/exercises">Exercises</Navlink>
           <Navlink to="/calorie-calculator">Calorie calculator</Navlink>
-          
+
         </NavItems>
+        {isMobileMenuOpen && (
+          <MobileMenu isOpen={isMobileMenuOpen}>
+            <Navlink to="/">Dashboard</Navlink>
+            <Navlink to="/workouts">Workouts</Navlink>
+            <Navlink to="/exercises">Exercises</Navlink>
+            <Navlink to="/calorie-calculator">Calorie Calculator</Navlink>
+          </MobileMenu>
+        )}
 
         <UserContainer>
           {/* Use the ProfileDropdown component */}
