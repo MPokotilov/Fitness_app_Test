@@ -15,6 +15,10 @@ const Container = styled.div`
   justify-content: center;
   padding: 22px 0px;
   overflow-y: scroll;
+  overflow-x: hidden;
+  @media (max-width: 600px) {
+    padding: 10px 0; 
+  }
 `;
 
 const Wrapper = styled.div`
@@ -23,12 +27,15 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 22px;
+
   @media (max-width: 600px) {
     gap: 12px;
-   
+    padding: 0 10px; 
   }
+
   @media (max-width: 375px) {
-    max-width: 350px;
+    max-width: 350px; 
+    padding: 0 8px;
   }
 `;
 
@@ -37,6 +44,12 @@ const Title = styled.div`
   font-size: 22px;
   color: ${({ theme }) => theme.text_primary};
   font-weight: 500;
+
+  @media (max-width: 600px) {
+    font-size: 18px; 
+    padding: 0 10px; 
+    text-align: center; 
+  }
 `;
 
 const FlexWrap = styled.div`
@@ -45,8 +58,15 @@ const FlexWrap = styled.div`
   justify-content: space-between;
   gap: 22px;
   padding: 0px 16px;
+
   @media (max-width: 600px) {
-    gap: 12px;
+    gap: 12px; 
+    justify-content: center; 
+    padding: 0 10px; 
+  }
+
+  @media (max-width: 375px) {
+    gap: 8px; 
   }
 `;
 
@@ -55,8 +75,14 @@ const Section = styled.div`
   flex-direction: column;
   padding: 0px 16px;
   gap: 22px;
+
   @media (max-width: 600px) {
-    gap: 12px;
+    gap: 12px; 
+    padding: 0 10px;
+  }
+
+  @media (max-width: 375px) {
+    padding: 0 8px;
   }
 `;
 
@@ -66,10 +92,18 @@ const CardWrapper = styled.div`
   justify-content: center;
   gap: 20px;
   margin-bottom: 100px;
+
   @media (max-width: 600px) {
-    gap: 12px;
+    gap: 12px; 
+    margin-bottom: 50px; 
+  }
+
+  @media (max-width: 375px) {
+    gap: 8px; 
+    margin-bottom: 30px; 
   }
 `;
+
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);

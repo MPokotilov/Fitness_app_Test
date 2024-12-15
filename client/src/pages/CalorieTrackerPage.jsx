@@ -13,8 +13,8 @@ const CalorieTrackerPage = () => {
   const targetWeightRef = useRef("");
   const activityLevelRef = useRef(1.2);
 
-  const [targetDate, setTargetDate] = useState(null); // Use state only for the date
-  const [goal, setGoal] = useState("weight_loss"); // Changed to state
+  const [targetDate, setTargetDate] = useState(null); 
+  const [goal, setGoal] = useState("weight_loss"); 
   const [dailyCalories, setDailyCalories] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [labels, setLabels] = useState([]);
@@ -23,7 +23,7 @@ const CalorieTrackerPage = () => {
 
   const { weightUnit } = useWeightUnit();
 
-  // Prevent invalid input (negative, letters, etc.)
+  
   const preventNegativeInput = useCallback((e) => {
     if (
       e.key === "-" ||
@@ -101,13 +101,21 @@ const CalorieTrackerPage = () => {
     const adjustedBMR = BMR * activityLevel;
 
     let dailyCalories = adjustedBMR;
+    
     if (goal === "weight_loss" || goal === "weight_gain") {
       const totalCalories = weightDifference * 7700;
       const dailyChange = totalCalories / daysDiff;
-
+      if (dailyChange > 1000 || dailyChange < -1000) {
+        setErrorMessage(
+          "The selected target date is too short for your goal and may harm your health. Please choose a more realistic date."
+        );
+        return;
+      }
+  
       dailyCalories =
-        goal === "weight_loss" ? adjustedBMR - dailyChange : adjustedBMR + dailyChange;
+        goal === "weight_loss" ? adjustedBMR + dailyChange : adjustedBMR + dailyChange;
     }
+      
 
     setDailyCalories(Math.round(dailyCalories));
 
@@ -139,7 +147,7 @@ const CalorieTrackerPage = () => {
       <Card>
         <ContentContainer>
           <Form onSubmit={calculateDailyCalories}>
-            <Title>Calorie Tracker</Title>
+            <Title>Calorie Calculator</Title>
 
             <Label>Gender:</Label>
             <StyledSelect ref={genderRef} data-testid="select-gender">
@@ -320,8 +328,8 @@ const Button = styled.button`
   }
 
   @media screen and (max-width: 768px) {
-    font-size: 14px; /* Adjust font size for mobile */
-    padding: 10px; /* Adjust padding for smaller screens */
+    font-size: 14px; 
+    padding: 10px; 
   }
 `;
 

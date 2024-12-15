@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import LogoImg from "../utils/Images/Logo.png";
 import { Link as LinkR, NavLink } from "react-router-dom";
@@ -44,11 +44,16 @@ const NavLogo = styled(LinkR)`
   font-size: 18px;
   text-decoration: none;
   color: ${({ theme }) => theme.primary};
+  
 `;
 
 const Logo = styled.img`
   height: 60px;
+  @media (max-width: 375px) {
+    justify-content: center;
+  }
 `;
+
 
 const Mobileicon = styled.div`
   color: ${({ theme }) => theme.text_primary};
@@ -63,9 +68,9 @@ const MobileMenu = styled.div`
   position: fixed;
   top: 50px; // Same height as the navbar
   left: 0;
-  width: 50%;
+  width: 40%;
   border-radius: 8px;
-  background-color: ${({ theme }) => theme.bg};
+  background: ${({ theme }) => theme.card};
   display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
   flex-direction: column;
   padding: 16px;
@@ -176,6 +181,19 @@ const ToggleButton = styled.input`
 const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
   const dispatch = useDispatch();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef(null);
+
+  // Close mobile menu 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  
   return (
     <Nav>
       <NavContainer>
@@ -195,7 +213,7 @@ const Navbar = ({ currentUser, toggleTheme, isDarkMode }) => {
 
         </NavItems>
         {isMobileMenuOpen && (
-          <MobileMenu isOpen={isMobileMenuOpen}>
+          <MobileMenu isOpen={isMobileMenuOpen} ref={mobileMenuRef}>
             <Navlink to="/">Dashboard</Navlink>
             <Navlink to="/workouts">Workouts</Navlink>
             <Navlink to="/exercises">Exercises</Navlink>
