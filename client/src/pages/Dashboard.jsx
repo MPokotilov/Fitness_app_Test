@@ -19,6 +19,9 @@ const Container = styled.div`
   @media (max-width: 600px) {
     padding: 10px 0; 
   }
+  @media (max-width: 300px) {
+    padding: 5px 0; 
+  }
 `;
 
 const Wrapper = styled.div`
@@ -37,6 +40,12 @@ const Wrapper = styled.div`
     max-width: 350px; 
     padding: 0 8px;
   }
+
+  @media (max-width: 300px) {
+    max-width: 150px;
+    gap: 8px;
+    padding: 0 5px;
+  }
 `;
 
 const Title = styled.div`
@@ -49,6 +58,11 @@ const Title = styled.div`
     font-size: 18px; 
     padding: 0 10px; 
     text-align: center; 
+  }
+
+  @media (max-width: 300px) {
+    font-size: 16px;
+    padding: 0 5px;
   }
 `;
 
@@ -68,6 +82,11 @@ const FlexWrap = styled.div`
   @media (max-width: 375px) {
     gap: 8px; 
   }
+
+  @media (max-width: 300px) {
+    gap: 5px;
+    padding: 0 5px;
+  }
 `;
 
 const Section = styled.div`
@@ -83,6 +102,11 @@ const Section = styled.div`
 
   @media (max-width: 375px) {
     padding: 0 8px;
+  }
+
+  @media (max-width: 300px) {
+    gap: 8px;
+    padding: 0 5px;
   }
 `;
 
@@ -101,6 +125,11 @@ const CardWrapper = styled.div`
   @media (max-width: 375px) {
     gap: 8px; 
     margin-bottom: 30px; 
+  }
+
+  @media (max-width: 300px) {
+    gap: 5px; 
+    margin-bottom: 15px; 
   }
 `;
 
