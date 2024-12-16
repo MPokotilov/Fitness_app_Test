@@ -1,10 +1,10 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-
-// Import SVG files instead of PNG
 import { ReactComponent as BodyPartIcon } from '../utils/Images/body-part.svg';
 import { ReactComponent as TargetIcon } from '../utils/Images/target.svg';
 import { ReactComponent as EquipmentIcon } from '../utils/Images/equipment.svg';
+import { ContentCopy } from '@mui/icons-material';
+import Tooltip from '@mui/material/Tooltip';
 
 const Container = styled.div`
   display: flex;
@@ -20,7 +20,6 @@ const Container = styled.div`
     flex-direction: row;
     padding: 50px;
   }
-    
 `;
 
 const ImageWrapper = styled.div`
@@ -48,6 +47,7 @@ const ImageWrapper = styled.div`
 
 const InfoWrapper = styled.div`
   flex: 1;
+  position: relative;
 
   h1 {
     font-size: 2.8rem;
@@ -61,14 +61,16 @@ const InfoWrapper = styled.div`
     }
   }
 
-  p {
-    font-size: 1.25rem;
-    line-height: 1.6;
-    margin-bottom: 40px;
-    color: ${({ theme }) => theme.text_secondary};
+  .copy-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    color: ${({ theme }) => theme.primary};
+    transition: color 0.2s ease-in-out;
 
-    @media (min-width: 992px) {
-      font-size: 1.4rem;
+    &:hover {
+      color: ${({ theme }) => theme.primaryHover || theme.secondary};
     }
   }
 `;
@@ -106,7 +108,7 @@ const DetailItem = styled.div`
     svg {
       width: 40px;
       height: 40px;
-      fill: ${({ theme }) => theme.primary}; /* Apply the theme's primary color */
+      fill: ${({ theme }) => theme.primary};
     }
   }
 
@@ -139,13 +141,23 @@ const Detail = ({ exerciseDetail }) => {
     },
   ];
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(name);
+    alert(`Exercise name "${name}" copied to clipboard!`);
+  };
+
   return (
     <Container>
       <ImageWrapper>
         <img src={gifUrl} alt={name} loading="lazy" />
       </ImageWrapper>
       <InfoWrapper>
-        <h1>{name}</h1>
+        <h1>
+          {name}
+          <Tooltip title="Copy Exercise Name">
+            <ContentCopy className="copy-icon" onClick={copyToClipboard} />
+          </Tooltip>
+        </h1>
         <p>
           Exercises keep you strong. <span>{name}</span> is one of the best exercises to target your{' '}
           <span>{target}</span>. It will help you improve your mood and gain energy.
@@ -153,9 +165,7 @@ const Detail = ({ exerciseDetail }) => {
         <ExtraDetail>
           {extraDetail.map((item) => (
             <DetailItem key={item.name}>
-              <div className="icon-button">
-                {item.icon}
-              </div>
+              <div className="icon-button">{item.icon}</div>
               <span>{item.name}</span>
             </DetailItem>
           ))}
